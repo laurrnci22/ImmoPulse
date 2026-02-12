@@ -33,6 +33,7 @@ services:
     volumes:
       - ./init-scripts/postgres:/docker-entrypoint-initdb.d
       - ./pg_data:/var/lib/postgresql
+      - ./datas:/data_import
 
       # In this example, we share an init.sql script with the container
       # The init script will be executed when the database is first run
