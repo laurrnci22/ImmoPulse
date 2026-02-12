@@ -33,7 +33,6 @@ services:
     volumes:
       - ./init-scripts/postgres:/docker-entrypoint-initdb.d
       - ./pg_data:/var/lib/postgresql
-      - ./datas:/data_import
 
       # In this example, we share an init.sql script with the container
       # The init script will be executed when the database is first run
@@ -63,3 +62,14 @@ services:
       CLICKHOUSE_DB: default
       CLICKHOUSE_USER: username
       CLICKHOUSE_PASSWORD: password
+
+  ui:
+    build: ./immopulse-ui
+    container_name: immopulse-ui
+    ports:
+      - "80:3000"
+    volumes:
+      - ./immopulse-ui:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
