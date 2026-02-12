@@ -30,7 +30,10 @@ services:
       POSTGRES_USER: username # The PostgreSQL user (useful to connect to the database)
       POSTGRES_PASSWORD: password # The PostgreSQL password (useful to connect to the database)
       POSTGRES_DB: default_database # The PostgreSQL default database (automatically created at first launch)
-    # volumes:
+    volumes:
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
+      - ./pg_data:/var/lib/postgresql
+
       # In this example, we share an init.sql script with the container
       # The init script will be executed when the database is first run
       # - ./minijournal-api/src/test/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
@@ -40,3 +43,22 @@ services:
     ports:
       - '3000:3000' # UI, credentials: admin / admin
       - '4318:4318' # OTel collector HTTP port
+
+
+  clickhouse:
+    image: 'clickhouse/clickhouse-server:latest'
+    ports:
+      - '8123:8123' # Port HTTP (utilisé par Grafana, JDBC, etc.)
+      - '9000:9000' # Port natif (utilisé par clickhouse-client)
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./ch_data:/var/lib/clickhouse
+      - ./init-scripts/clickhouse:/docker-entrypoint-initdb.d
+      - ./datas:/var/lib/clickhouse/user_files
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: username
+      CLICKHOUSE_PASSWORD: password
