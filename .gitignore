@@ -1,2 +1,4 @@
 datas/*.csv
 !datas/*.csv.gz
+.DS_Store
+.idea/*
