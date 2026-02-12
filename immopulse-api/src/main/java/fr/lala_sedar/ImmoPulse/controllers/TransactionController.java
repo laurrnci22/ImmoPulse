@@ -16,7 +16,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
-
+/*
     @GetMapping("")
     public ResponseEntity<Collection<TransactionDTO>> getAllTransactions(
             @RequestParam(required = false) Collection<String> authorNames
@@ -32,5 +32,5 @@ public class TransactionController {
                 .map(TransactionMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
+    }*/
 }

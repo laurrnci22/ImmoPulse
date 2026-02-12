@@ -5,7 +5,7 @@ import fr.lala_sedar.ImmoPulse.infra.entity.UserEntity;
 
 public record TransactionBO(TransactionEntity transaction) {
 
-    public TransactionBO(
+  /*  public TransactionBO(
             Long userId,
             String username,
             String password,
@@ -18,6 +18,6 @@ public record TransactionBO(TransactionEntity transaction) {
             setRole(role);
         }};
         this(userEntity);
-    }
+    }*/
 }
 
