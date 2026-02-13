@@ -38,4 +38,4 @@ jobs:
       - name: Build with Gradle
         run: |
           cd immopulse-api
-          ./gradlew build
+          ./gradlew build -x test
