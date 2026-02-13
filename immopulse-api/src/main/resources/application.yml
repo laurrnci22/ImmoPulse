@@ -30,7 +30,7 @@ logging:
 
 springdoc:
   swagger-ui:
-    path: /api/docs
+    path: /docs
 
 management:
   tracing:
