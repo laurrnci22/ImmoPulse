@@ -13,10 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Démarrer la base de données et les outils (Grafana/Clickhouse)
-      # On utilise -d pour les lancer en arrière-plan
+      # 1. Démarrer les services (Note l'espace au lieu du tiret)
       - name: Start Services with Docker Compose
-        run: docker-compose up -d database clickhouse grafana
+        run: |
+          docker compose up -d database clickhouse grafana
+          # On attend que les bases soient prêtes (healthcheck manuel rapide)
+          echo "Waiting for databases to be ready..."
+          sleep 20
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -28,10 +31,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x immopulse-api/gradlew
 
-      # 2. Build avec les variables d'environnement correspondantes
-      # On ajoute une petite attente pour laisser aux DB le temps de démarrer
+      # 2. Lancer le build
+      # On force le profil 'test' si besoin, ou on laisse par défaut
       - name: Build with Gradle
         run: |
-          sleep 15 
           cd immopulse-api
           ./gradlew build
