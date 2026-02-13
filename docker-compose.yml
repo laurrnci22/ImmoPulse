@@ -33,11 +33,12 @@ services:
     volumes:
       - ./init-scripts/postgres:/docker-entrypoint-initdb.d
       - ./pg_data:/var/lib/postgresql
-      - ./datas:/data_import
 
-      # In this example, we share an init.sql script with the container
-      # The init script will be executed when the database is first run
-      # - ./minijournal-api/src/test/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U username -d default_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   grafana:
     image: 'grafana/otel-lgtm:0.11.10'
@@ -63,3 +64,39 @@ services:
       CLICKHOUSE_DB: default
       CLICKHOUSE_USER: username
       CLICKHOUSE_PASSWORD: password
+
+  ui:
+    build: ./immopulse-ui
+    container_name: immopulse-ui
+    ports:
+      - "81:3000"
+    volumes:
+      - ./immopulse-ui:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+  
+  api:
+    build: ./immopulse-api
+    container_name: immopulse-api
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_POSTGRES_URL: jdbc:postgresql://database:5432/default_database
+      SPRING_DATASOURCE_POSTGRES_USERNAME: username
+      SPRING_DATASOURCE_POSTGRES_PASSWORD: password
+      SPRING_DATASOURCE_POSTGRES_DRIVER-CLASS-NAME: org.postgresql.Driver
+      
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+
+      SPRING_DATASOURCE_CLICKHOUSE_URL: jdbc:clickhouse://clickhouse:8123/default
+      SPRING_DATASOURCE_CLICKHOUSE_USERNAME: username
+      SPRING_DATASOURCE_CLICKHOUSE_PASSWORD: password
+      
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana:4318
+      
+    depends_on:
+      database:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started

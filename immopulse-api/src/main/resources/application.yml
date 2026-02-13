@@ -6,15 +6,21 @@ spring:
     name: immopulse-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/default_database
-    username: username
-    password: password
-    driver-class-name: org.postgresql.Driver
+    postgres:
+      url: jdbc:postgresql://localhost:5432/default_database
+      username: username
+      password: password
+      driver-class-name: org.postgresql.Driver
+    clickhouse:
+      url: jdbc:clickhouse://localhost:8123/default?compress=0
+      username: username
+      password: password
+      driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
 
   jpa:
-    show-sql: false # to display SQL queries in the console
+    show-sql: true # to display SQL queries in the console
     hibernate:
-      ddl-auto: none # to let Spring create the schema by running migrations
+      ddl-auto: update # to let Spring create the schema by running migrations
 
 logging:
   level:
