@@ -13,14 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Démarrer les services (Note l'espace au lieu du tiret)
       - name: Start Services with Docker Compose
         run: |
-          docker compose up -d database clickhouse grafana
-          echo "Services started. Setting permissions and waiting for databases to be ready..."
-          sudo chmod -R 777 /home/runner/work/ImmoPulse/ImmoPulse/ch_data
-          # On attend que les bases soient prêtes (healthcheck manuel rapide)
-          echo "Waiting for databases to be ready..."
+          # On lance Docker en écrasant les volumes par des volumes vides/anonymes
+          # Cela évite la création des dossiers ./ch_data et ./pg_data sur le runner
+          docker compose run -d --name db -p 5432:5432 -v /var/lib/postgresql/data database
+          docker compose run -d --name ch -p 8123:8123 -p 9000:9000 -v /var/lib/clickhouse clickhouse
+          docker compose up -d grafana
+          
+          echo "Waiting for databases..."
           sleep 20
 
       - name: Set up JDK 25
@@ -28,13 +29,12 @@ jobs:
         with:
           java-version: '25'
           distribution: 'temurin'
-          cache: 'gradle'
+          # On retire temporairement le cache gradle pour isoler si le problème vient de là
+          # cache: 'gradle' 
 
       - name: Grant execute permission for gradlew
         run: chmod +x immopulse-api/gradlew
 
-      # 2. Lancer le build
-      # On force le profil 'test' si besoin, ou on laisse par défaut
       - name: Build with Gradle
         run: |
           cd immopulse-api
