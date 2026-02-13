@@ -13,24 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Start Services with Docker Compose
-        run: |
-          # On lance Docker en écrasant les volumes par des volumes vides/anonymes
-          # Cela évite la création des dossiers ./ch_data et ./pg_data sur le runner
-          docker compose run -d --name db -p 5432:5432 -v /var/lib/postgresql/data database
-          docker compose run -d --name ch -p 8123:8123 -p 9000:9000 -v /var/lib/clickhouse clickhouse
-          docker compose up -d grafana
-          
-          echo "Waiting for databases..."
-          sleep 20
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-          # On retire temporairement le cache gradle pour isoler si le problème vient de là
-          # cache: 'gradle' 
+          cache: 'gradle' 
 
       - name: Grant execute permission for gradlew
         run: chmod +x immopulse-api/gradlew
