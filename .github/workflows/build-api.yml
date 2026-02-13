@@ -2,13 +2,9 @@ name: Run Build Immopulse API
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [ main, develop ]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ main, develop ]
 
 jobs:
   build:
@@ -16,6 +12,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # 1. Démarrer la base de données et les outils (Grafana/Clickhouse)
+      # On utilise -d pour les lancer en arrière-plan
+      - name: Start Services with Docker Compose
+        run: docker-compose up -d database clickhouse grafana
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -27,7 +28,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x immopulse-api/gradlew
 
+      # 2. Build avec les variables d'environnement correspondantes
+      # On ajoute une petite attente pour laisser aux DB le temps de démarrer
       - name: Build with Gradle
         run: |
+          sleep 15 
           cd immopulse-api
           ./gradlew build
