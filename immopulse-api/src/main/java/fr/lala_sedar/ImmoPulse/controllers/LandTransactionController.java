@@ -4,6 +4,10 @@ import fr.lala_sedar.ImmoPulse.controllers.dto.out.LandTransactionDTO;
 import fr.lala_sedar.ImmoPulse.domain.service.LandTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -19,9 +23,11 @@ public class LandTransactionController {
     private final LandTransactionService landTransactionService;
 
     @GetMapping
-    public Collection<LandTransactionDTO> getAll() {
-        log.info("Fetching all transactions");
-        return landTransactionService.findAll();
+    public Page<LandTransactionDTO> getAll(
+            @PageableDefault(size = 20, sort = "mutationDate", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        log.info("Fetching transactions - Page: {}, Size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        return landTransactionService.getAll(pageable);
     }
 
     @GetMapping("/stats/avg-price-city")
