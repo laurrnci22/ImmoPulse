@@ -17,6 +17,7 @@ jobs:
       - name: Start Services with Docker Compose
         run: |
           docker compose up -d database clickhouse grafana
+          echo "Services started. Setting permissions and waiting for databases to be ready..."
           sudo chmod -R 777 .
           # On attend que les bases soient prêtes (healthcheck manuel rapide)
           echo "Waiting for databases to be ready..."
