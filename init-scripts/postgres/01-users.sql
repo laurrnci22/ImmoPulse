@@ -5,6 +5,3 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(50) DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-INSERT INTO users (username, password, role) 
-VALUES ('toto', 'hashed_secret_password', 'admin');
