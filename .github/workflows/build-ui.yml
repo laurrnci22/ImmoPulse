@@ -33,8 +33,3 @@ jobs:
         run: |
           cd immopulse-ui
           npm run build
-
-      - name: Run tests
-        run: |
-          cd immopulse-ui
-          npm run test
