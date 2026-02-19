@@ -1,6 +1,6 @@
 package fr.lala_sedar.ImmoPulse.domain.service;
 
-import fr.lala_sedar.ImmoPulse.controllers.dto.out.LandTransactionDTO;
+import fr.lala_sedar.ImmoPulse.controllers.dto.out.*;
 import fr.lala_sedar.ImmoPulse.domain.mapper.LandTransactionMapper;
 import fr.lala_sedar.ImmoPulse.infra.repository.clickhouse.LandTransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,5 +39,21 @@ public class LandTransactionService {
         long total = repository.count();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    public MarketSummaryDTO getGlobalStats() {
+        return repository.getGlobalStats();
+    }
+
+    public List<MarketMonthlyStatDTO> getMonthlyStats() {
+        return repository.getMonthlyStats();
+    }
+
+    public List<MarketPriceMonthlyStatDTO> getPriceMonthlyStats() {
+        return repository.getMonthlyStatsWithAvgPricePerSqm();
+    }
+
+    public List<DepartmentStatDTO> getDepartmentStats() {
+        return repository.getDepartmentStats();
     }
 }
