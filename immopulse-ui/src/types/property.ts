@@ -17,11 +17,10 @@ export interface Property {
 
 export interface DepartmentStats {
   departmentCode: string;
-  departmentName: string;
   avgPricePerSqm: number;
   totalSales: number;
   avgPrice: number;
-  priceEvolution: number; // Percentage change
+  priceEvolution: number;
 }
 
 export interface MonthlyStats {
@@ -37,4 +36,10 @@ export interface MarketStats {
   avgPrice: number;
   totalVolume: number;
   yearOverYearChange: number;
+}
+
+export interface MarketPriceStats {
+  month: string;
+  sales: number;
+  avgPricePerSqm: number;
 }

@@ -1,6 +1,5 @@
 import { Card } from '../../components/ui/card.tsx';
 import { TrendingUp, TrendingDown, Home, EuroIcon, BarChart3, Activity } from 'lucide-react';
-import { mockMarketStats, mockMonthlyStats, mockDepartmentStats } from '../../data/mockData.ts';
 import {
   LineChart,
   Line,
@@ -13,9 +12,54 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import {useEffect, useState} from "react";
+import {LandTransactionService} from "../../services/LandTransactionService.ts";
+import type {DepartmentStats, MarketPriceStats, MarketStats, MonthlyStats} from "../../types/property.ts";
 
 export function Dashboard() {
-  const stats = mockMarketStats;
+
+  const [stats, setStats] = useState<MarketStats>({
+    totalTransactions: 0,
+    avgPricePerSqm: 0,
+    avgPrice: 0,
+    totalVolume: 0,
+    yearOverYearChange: 0,
+  });
+
+  const [monthlyStats, setMonthlyStats] = useState<MonthlyStats[]>([]);
+  const [priceAvgPerSqm, setPriceAvgPerSqm] = useState<MarketPriceStats[]>([]);
+  const [departmentStats, setDepartmentStats] = useState<DepartmentStats[]>([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await LandTransactionService.getGlobalStats();
+        const formattedData: MarketStats = {
+          totalTransactions: data.totalTransactions,
+          avgPricePerSqm: data.avgPricePerSqm,
+          avgPrice: data.avgPrice,
+          totalVolume: data.totalVolume,
+          yearOverYearChange: data.yearOverYearChange,
+        };
+
+        setStats(formattedData);
+
+        const monthly = await LandTransactionService.getMarketMonthlyStats();
+        setMonthlyStats(monthly);
+
+        const priceMonthly = await LandTransactionService.getMonthlyStatsWithAvgPricePerSqm();
+        setPriceAvgPerSqm(priceMonthly);
+
+        const departmentStats = await LandTransactionService.getDepartmentStats();
+        setDepartmentStats(departmentStats);
+
+      } catch (error) {
+        console.error("Erreur de chargement des données statistiques", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -103,7 +147,7 @@ export function Dashboard() {
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Évolution des ventes mensuelles</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={mockMonthlyStats}>
+            <BarChart data={monthlyStats}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
@@ -121,7 +165,7 @@ export function Dashboard() {
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Évolution du prix moyen au m²</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={mockMonthlyStats}>
+            <LineChart data={priceAvgPerSqm}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
@@ -158,11 +202,11 @@ export function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {mockDepartmentStats.map((dept) => (
+              {departmentStats.map((dept) => (
                 <tr key={dept.departmentCode} className="border-b hover:bg-gray-50">
                   <td className="py-3 px-4">
                     <div>
-                      <span className="font-medium">{dept.departmentName}</span>
+                      <span className="font-medium">{dept.departmentCode}</span>
                       <span className="text-gray-500 ml-2">({dept.departmentCode})</span>
                     </div>
                   </td>
