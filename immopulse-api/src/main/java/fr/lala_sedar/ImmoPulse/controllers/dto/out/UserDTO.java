@@ -4,5 +4,6 @@ import fr.lala_sedar.ImmoPulse.infra.entity.enums.Role;
 
 public record UserDTO (
         String username,
-        Role role
+        Role role,
+        String ImageUrl
 ) {}

@@ -1,5 +1,6 @@
 package fr.lala_sedar.ImmoPulse.controllers;
 
+import fr.lala_sedar.ImmoPulse.controllers.dto.out.UserDTO;
 import fr.lala_sedar.ImmoPulse.controllers.dto.out.UserResponseDTO;
 import fr.lala_sedar.ImmoPulse.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,9 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> me(Authentication authentication) {
+    public ResponseEntity<UserDTO> me(Authentication authentication) {
         UserResponseDTO user = userService.getUserInfo(authentication.getName());
-
-        return ResponseEntity.ok(user);
+        UserDTO userDTO = userService.findById(user.id());
+        return ResponseEntity.ok(userDTO);
     }
 }
