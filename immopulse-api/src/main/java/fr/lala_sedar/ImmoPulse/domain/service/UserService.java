@@ -66,6 +66,19 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Retrieves a user by id from the database.
+     * @param id the id of the user to retrieve.
+     * @return a {@link UserDTO} representing the user with the specified id.
+     * @throws UsernameNotFoundException if the user with the specified id is not found.
+     */
+    @Transactional(readOnly = true)
+    public UserDTO findById(Long id) {
+        UserEntity user = repository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+        return UserMapper.toDTO(user);
+    }
+
+    /**
      * Loads a user by their username for Spring Security authentication.
      *
      * @param username the username identifying the user whose data is required.
