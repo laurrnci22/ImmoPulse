@@ -4,12 +4,15 @@ import { MainLayout } from "./components/layouts/mainLayout.tsx";
 import { Dashboard } from "./pages/Dashboard/Dashboard.tsx";
 import { PropertiesList } from "./pages/Properties/PropertiesList.tsx";
 import { Register } from "./components/Register";
+import {SearchProvider} from "./contexts/SearchContextType.tsx";
 
 export const router = createBrowserRouter([
     {
         element: (
             <AuthProvider>
-                <MainLayout />
+                <SearchProvider>
+                    <MainLayout />
+                </SearchProvider>
             </AuthProvider>
         ),
         children: [
