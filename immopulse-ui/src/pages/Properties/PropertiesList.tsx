@@ -4,6 +4,7 @@ import type { LandTransaction } from "../../models/LandTransaction.ts";
 import { LandTransactionService } from "../../services/LandTransactionService.ts";
 import {LandTransactionGrid} from "../../components/LandTransactionGrid.tsx";
 import {Pagination} from "../../components/Pagination.tsx";
+import {useSearch} from "../../contexts/SearchContextType.tsx";
 
 export function PropertiesList() {
   const [landTransactions, setLandTransactions] = useState<LandTransaction[]>([]);
@@ -11,6 +12,7 @@ export function PropertiesList() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [isFetching, setIsFetching] = useState(false);
+  const { searchTerm } = useSearch();
 
   const [filters, setFilters] = useState({
     type: 'all',
@@ -25,7 +27,7 @@ export function PropertiesList() {
       try {
         setIsFetching(true);
 
-        const data = await LandTransactionService.getLandTransactions(currentPage, 20);
+        const data = await LandTransactionService.getLandTransactions(currentPage, 20, searchTerm);
 
         setLandTransactions(data.content);
         setTotalPages(data.totalPages);
@@ -40,7 +42,7 @@ export function PropertiesList() {
     };
 
     fetchTransactions();
-  }, [currentPage]);
+  }, [currentPage, searchTerm]);
 
   return (
       <div className="container mx-auto px-4 py-8">

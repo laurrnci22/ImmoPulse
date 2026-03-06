@@ -13,6 +13,7 @@ import {DesktopNav} from "../../DesktopNav";
 import {SearchBar} from "../../SearchBar";
 import {UserActions} from "../../UserActions";
 import {MobileMenu} from "../../MobileMenu";
+import {useSearch} from "../../../contexts/SearchContextType.tsx";
 
 
 const navigation: NavigationItem[] = [
@@ -23,14 +24,13 @@ const navigation: NavigationItem[] = [
 export const Header: FC<HeaderProps> = ({ onSearch }) => {
     const auth: AuthContextType | undefined = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { searchTerm, setSearchTerm } = useSearch();
 
     const location = useLocation();
     const navigate = useNavigate();
 
     const isProperties = location.pathname === "/properties" || location.pathname === "/";
     const isAdmin = auth?.user?.role === "ADMIN";
-    console.log("user ---- ")
-    console.log(auth?.user)
 
     const allowedNavigation = navigation.filter((item) => {
         if (item.name === "Dashboard") {
@@ -68,7 +68,11 @@ export const Header: FC<HeaderProps> = ({ onSearch }) => {
 
                     {isProperties && (
                         <div className="hidden lg:flex flex-1 max-w-md">
-                            <SearchBar onSearch={onSearch} placeholder="Ville, code postal..." />
+                            <SearchBar
+                                value={searchTerm}
+                                onSearch={(value) => setSearchTerm(value)}
+                                placeholder="Ville, code postal..."
+                            />
                         </div>
                     )}
 

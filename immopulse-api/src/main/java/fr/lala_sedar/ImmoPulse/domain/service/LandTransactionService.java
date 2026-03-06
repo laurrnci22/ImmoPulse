@@ -23,11 +23,15 @@ public class LandTransactionService {
         return repository.getAveragePriceByCity();
     }
 
-    public Collection<LandTransactionDTO> findByCriteria(String dept, String type) {
-        return repository.findByCriteria(dept, type)
+    public Page<LandTransactionDTO> search(String term, Pageable pageable) {
+        List<LandTransactionDTO> content = repository.search(term, pageable)
                 .stream()
                 .map(LandTransactionMapper::toDTO)
                 .toList();
+
+        long total = repository.count(term);
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     public Page<LandTransactionDTO> getAll(Pageable pageable) {
@@ -36,7 +40,7 @@ public class LandTransactionService {
                 .map(LandTransactionMapper::toDTO)
                 .toList();
 
-        long total = repository.count();
+        long total = repository.count("");
 
         return new PageImpl<>(content, pageable, total);
     }

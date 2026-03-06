@@ -6,11 +6,13 @@ import type {FC} from "react";
 
 
 interface SearchBarProps {
+    value?: string;
     onSearch?: (val: string) => void;
     placeholder?: string;
 }
 
 export const SearchBar: FC<SearchBarProps> = ({
+                                                  value,
                                                   onSearch,
                                                   placeholder = "Rechercher..."
                                               }) => {
@@ -20,6 +22,7 @@ export const SearchBar: FC<SearchBarProps> = ({
             <Input
                 type="text"
                 placeholder={placeholder}
+                value={value}
                 className="pl-10 h-10 border-slate-200/60 bg-white/80 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-slate-300 focus:bg-white focus:shadow-sm w-full"
                 onChange={(e) => onSearch?.(e.target.value)}
             />
