@@ -63,9 +63,11 @@ export const getPeriods = async (): Promise<string[]> => {
 
 
 export class LandTransactionService {
-    static async getLandTransactions(page: number = 0, size: number = 100) {
+    static async getLandTransactions(page: number = 0, size: number = 100, searchTerm?: string) {
         try {
-            const response = await api.get(`${BASE_URL}?page=${page}&size=${size}`);
+            const url = searchTerm != "" ? `${BASE_URL}/search?term=${searchTerm}&${page}&size=${size}` : `${BASE_URL}?page=${page}&size=${size}`;
+            const response = await api.get(url);
+
             return response.data;
 
         } catch (error) {

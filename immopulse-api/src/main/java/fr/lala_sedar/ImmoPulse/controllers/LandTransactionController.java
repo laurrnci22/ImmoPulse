@@ -10,7 +10,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +25,15 @@ public class LandTransactionController {
     public Page<LandTransactionDTO> getAll(
             @PageableDefault(size = 20, sort = "mutationDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        log.info("Fetching transactions - Page: {}, Size: {}", pageable.getPageNumber(), pageable.getPageSize());
         return landTransactionService.getAll(pageable);
+    }
+
+    @GetMapping("/search")
+    public Page<LandTransactionDTO> search(
+            @RequestParam String term,
+            @PageableDefault(size = 20, sort = "mutationDate", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return landTransactionService.search(term, pageable);
     }
 
     @GetMapping("/stats/global")
@@ -48,13 +54,5 @@ public class LandTransactionController {
     @GetMapping("/stats/avg-price-city")
     public List<Map<String, Object>> getCityStats() {
         return landTransactionService.getCityStatistics();
-    }
-
-    // TODO route non utilisée pour le moment
-    @GetMapping("/search")
-    public Collection<LandTransactionDTO> search(
-            @RequestParam String dept,
-            @RequestParam String type) {
-        return landTransactionService.findByCriteria(dept, type);
     }
 }
