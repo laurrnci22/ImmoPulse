@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +21,7 @@ public class LandTransactionRepository {
 
     @Autowired
     @Qualifier("clickhouseJdbcTemplate")
-    private JdbcTemplate jdbcTemplate; // Toujours mettre en private
-
-    public List<LandTransactionEntity> findAll(int limit, int offset) {
-        String sql = "SELECT * FROM land_transaction LIMIT ? OFFSET ?";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(LandTransactionEntity.class), limit, offset);
-    }
+    private JdbcTemplate jdbcTemplate;
 
     public List<Map<String, Object>> getAveragePriceByCity() {
         String sql = "SELECT city, avg(property_value) as avg_price " +
@@ -36,13 +32,55 @@ public class LandTransactionRepository {
         return jdbcTemplate.queryForList(sql);
     }
 
-    public List<LandTransactionEntity> findByCriteria(String departmentCode, String propertyType) {
-        String sql = "SELECT * FROM land_transaction WHERE department_code = ? AND property_type = ? LIMIT 50";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(LandTransactionEntity.class), departmentCode, propertyType);
+    public List<LandTransactionEntity> search(String term, Pageable pageable) {
+        int limit = pageable.getPageSize();
+        long offset = pageable.getOffset();
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM land_transaction WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (term != null && !term.isBlank()) {
+            // Découper la recherche en mots
+            String[] tokens = term.split("\\s+");
+
+            for (String token : tokens) {
+                sql.append(" AND (")
+                        .append("property_type ILIKE ? OR ")
+                        .append("mutation_type ILIKE ? OR ")
+                        .append("city ILIKE ? OR ")
+                        .append("postal_code ILIKE ? OR ")
+                        .append("street_name ILIKE ?")
+                        .append(")");
+
+                String pattern = "%" + token + "%";
+                params.add(pattern);
+                params.add(pattern);
+                params.add(pattern);
+                params.add(pattern);
+                params.add(pattern);
+            }
+        }
+
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        return jdbcTemplate.query(
+                sql.toString(),
+                new BeanPropertyRowMapper<>(LandTransactionEntity.class),
+                params.toArray()
+        );
     }
 
-    public long count() {
+    public long count(String term) {
         String sql = "SELECT count() FROM land_transaction";
+
+        if (!term.isEmpty()) {
+            sql += " WHERE property_type = ?";
+            Long count = jdbcTemplate.queryForObject(sql, Long.class, term);
+            return count != null ? count : 0L;
+        }
+
         Long count = jdbcTemplate.queryForObject(sql, Long.class);
         return count != null ? count : 0L;
     }
