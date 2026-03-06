@@ -1,6 +1,7 @@
 import api from "./api.ts";
 import { toast } from 'react-toastify';
 import type {Departement} from "../models/LandTransaction.ts";
+import type {KpiStats, PropertyTypeDistribution} from "../types/property.ts";
 
 const BASE_URL = '/land-transaction';
 
@@ -61,6 +62,41 @@ export const getPeriods = async (): Promise<string[]> => {
 }
 
 
+export const getKpiStats = async (selectedDept, selectedType, selectedPeriod): Promise<KpiStats> => {
+    try {
+        // const response = await api.get<KpiStats>(`${BASE_URL}/stats?kpi=true&departement=${selectedDept}&propertyType=${selectedType}&period=${selectedPeriod}`);
+        const mockKpiStats: KpiStats = {
+            totalTransactions: { value: 150, trendValue: "+5.2%", up: true },
+            avgPricePerSqm: { value: 2500, trendValue: "+3.8%", up: true },
+            avgPrice: { value: 350000, trendValue: "+4.1%", up: true },
+            totalVolume: { value: 52500000, trendValue: "+6.0%", up: true }
+        };
+
+        return mockKpiStats;
+    } catch (error) {
+        toast.error("Erreur lors de la récupération des statistiques ! 😥");
+        throw error;
+    }
+}
+
+
+export const getPropertyTypesDistribution = async (selectedDept, selectedType, selectedPeriod): Promise<PropertyTypeDistribution[]> => {
+    try{
+        const mockDatas : PropertyTypeDistribution[] = [
+            {name: "appartement", value: 45000},
+            {name: "maison", value: 38000},
+            {name: "terrain", value: 12000},
+            {name: "local commercial", value: 5000},
+        ];
+
+        return mockDatas;
+    }
+    catch (error) {
+        toast.error("Erreur lors de la récupération de la répartition par typologie ! 😥");
+        throw error;
+    }
+
+}
 
 export class LandTransactionService {
     static async getLandTransactions(page: number = 0, size: number = 100) {

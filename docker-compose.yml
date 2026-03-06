@@ -69,13 +69,18 @@ services:
     build: ./immopulse-ui
     container_name: immopulse-ui
     ports:
-      - "81:3000"
+      - "81:4250"
     volumes:
       - ./immopulse-ui:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:3000
-  
+      - VITE_API_URL=http://localhost:8080/api
+      
+    depends_on:
+      database:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
   api:
     build: ./immopulse-api
     container_name: immopulse-api
