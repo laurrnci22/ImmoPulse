@@ -1,5 +1,6 @@
 package fr.lala_sedar.ImmoPulse.controllers;
 
+import fr.lala_sedar.ImmoPulse.controllers.dto.in.LandTransactionFilterDto;
 import fr.lala_sedar.ImmoPulse.controllers.dto.out.*;
 import fr.lala_sedar.ImmoPulse.domain.service.LandTransactionService;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,9 @@ public class LandTransactionController {
 
     @GetMapping("/stats/department")
     public List<DepartmentStatDTO> getDepartmentStats() {return landTransactionService.getDepartmentStats();}
+
+    @PostMapping("/search-filters")
+    public Page<LandTransactionDTO> searchWithFilters(@RequestBody LandTransactionFilterDto filters) {return landTransactionService.searchWithFilters(filters);}
 
     // TODO route non utilisée pour le moment
     @GetMapping("/stats/avg-price-city")
