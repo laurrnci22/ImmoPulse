@@ -1,11 +1,12 @@
 import type {User} from "./user.ts";
-import type {SignUpRequest} from "./AuthType.ts";
+import type {SignUpRequest, UpdateUserRequest} from "./AuthType.ts";
 
 export interface AuthContextType {
     user: User | null;
     loginUser: () => Promise<void>;
     logoutUser: () => Promise<void>;
     signUp: (request: SignUpRequest) => Promise<boolean>;
+    update: (request: UpdateUserRequest, username: string | undefined) => Promise<boolean>;
 
   /*  isLogout: boolean;
     notifications: NotificationModel[] | null;

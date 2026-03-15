@@ -1,8 +1,6 @@
 "use client";
 
 import { Link } from "react-router-dom";
-import { Bell, Heart } from "lucide-react";
-import { Button } from "../ui/button";
 import {type FC, useState} from "react";
 import type {User} from "../../types/user.ts";
 
@@ -12,8 +10,7 @@ interface UserActionsProps {
 }
 
 const userNavigation = [
-    { name: "Mon Profil", href: "/profile" },
-    { name: "Paramètres", href: "/settings" },
+    { name: "Mon Profil", href: "/user/profile" },
     { name: "Déconnexion", href: "/logout" },
 ];
 
@@ -22,16 +19,6 @@ export const UserActions: FC<UserActionsProps> = ({ user, onLogoutClick }) => {
 
     return (
         <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative text-gray-500">
-                <span className="sr-only">Notifications</span>
-                <Bell className="size-5" />
-                <span className="absolute top-2 right-2 size-2 bg-indigo-600 rounded-full border-2 border-white" />
-            </Button>
-
-            <Button variant="ghost" size="icon" className="text-gray-500">
-                <Heart className="size-5" />
-            </Button>
-
             <div className="relative ml-3">
                 <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -41,7 +28,7 @@ export const UserActions: FC<UserActionsProps> = ({ user, onLogoutClick }) => {
                 </button>
 
                 {isProfileOpen && (
-                    <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                        <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg">
                         <div className="px-4 py-3 border-b border-gray-100 mb-1">
                             <p className="text-sm font-medium text-gray-900 truncate">
                                 {user.username}

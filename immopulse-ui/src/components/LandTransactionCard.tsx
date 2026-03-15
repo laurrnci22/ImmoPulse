@@ -2,8 +2,7 @@
 
 import { Card } from './ui/card.tsx';
 import { Badge } from './ui/badge.tsx';
-import { Heart, MapPin, Home, Maximize, Calendar } from 'lucide-react';
-import { Button } from './ui/button.tsx';
+import { MapPin, Home, Maximize, Calendar } from 'lucide-react';
 import type { LandTransaction } from "../models/LandTransaction.ts";
 
 interface LandTransactionCardProps {
@@ -35,17 +34,6 @@ export function LandTransactionCard({ landTransaction, onSelect }: LandTransacti
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
-          <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 bg-white/90 hover:bg-white rounded-full shadow-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                // Logique favoris ici
-              }}
-          >
-            <Heart className="size-5 text-slate-600" />
-          </Button>
 
           <Badge className="absolute top-2 left-2 bg-indigo-600 text-white border-none shadow-md">
             {displayType}
