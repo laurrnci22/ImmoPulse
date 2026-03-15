@@ -45,9 +45,7 @@ public class LandTransactionService {
         return new PageImpl<>(content, pageable, total);
     }
 
-    public MarketSummaryDTO getGlobalStats() {
-        return repository.getGlobalStats();
-    }
+
 
     public List<MarketMonthlyStatDTO> getMonthlyStats() {
         return repository.getMonthlyStats();
@@ -59,5 +57,18 @@ public class LandTransactionService {
 
     public List<DepartmentStatDTO> getDepartmentStats() {
         return repository.getDepartmentStats();
+    }
+
+
+    public List<String> getAllDepartments() {
+        List<String> departments = repository.getAllDepartments();
+        departments.sort(String::compareTo);
+        return departments;
+    }
+
+    public List<String> getAllPropertyTypes() {
+        List<String> propertyTypes = repository.getAllPropertyTypes();
+        propertyTypes.sort(String::compareTo);
+        return propertyTypes;
     }
 }

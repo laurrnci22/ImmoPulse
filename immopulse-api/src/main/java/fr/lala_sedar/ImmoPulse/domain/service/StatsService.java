@@ -9,55 +9,20 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class LandTransactionService {
+public class StatsService {
 
     private final LandTransactionRepository repository;
 
-    public List<Map<String, Object>> getCityStatistics() {
-        return repository.getAveragePriceByCity();
+    public MarketSummaryDTO getGlobalStats(String departement, String propertyType) {
+        return repository.getGlobalStats(departement, propertyType);
     }
 
-    public Page<LandTransactionDTO> search(String term, Pageable pageable) {
-        List<LandTransactionDTO> content = repository.search(term, pageable)
-                .stream()
-                .map(LandTransactionMapper::toDTO)
-                .toList();
-
-        long total = repository.count(term);
-
-        return new PageImpl<>(content, pageable, total);
-    }
-
-    public Page<LandTransactionDTO> getAll(Pageable pageable) {
-        List<LandTransactionDTO> content = repository.getAll(pageable)
-                .stream()
-                .map(LandTransactionMapper::toDTO)
-                .toList();
-
-        long total = repository.count("");
-
-        return new PageImpl<>(content, pageable, total);
-    }
-
-    public MarketSummaryDTO getGlobalStats() {
-        return repository.getGlobalStats();
-    }
-
-    public List<MarketMonthlyStatDTO> getMonthlyStats() {
-        return repository.getMonthlyStats();
-    }
-
-    public List<MarketPriceMonthlyStatDTO> getPriceMonthlyStats() {
-        return repository.getMonthlyStatsWithAvgPricePerSqm();
-    }
-
-    public List<DepartmentStatDTO> getDepartmentStats() {
-        return repository.getDepartmentStats();
+    public List<PropertyDistributionDTO> getPropertyDistribution(String departement, String propertyType) {
+        return repository.getPropertyDistribution(departement, propertyType);
     }
 }

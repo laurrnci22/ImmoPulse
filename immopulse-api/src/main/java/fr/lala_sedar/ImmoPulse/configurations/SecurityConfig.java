@@ -50,16 +50,15 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-                        // On demande gentiment
+
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
-                        // AJOUTE CECI : On force l'écrasement du cookie avec le bon Path
                         .addLogoutHandler((request, response, authentication) -> {
                             jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("JSESSIONID", null);
-                            cookie.setPath("/"); // Très important : correspond au chemin par défaut
+                            cookie.setPath("/");
                             cookie.setHttpOnly(true);
-                            cookie.setMaxAge(0); // 0 = suppression immédiate
+                            cookie.setMaxAge(0);
                             response.addCookie(cookie);
                         })
                 );

@@ -1,9 +1,6 @@
 package fr.lala_sedar.ImmoPulse.infra.repository.clickhouse;
 
-import fr.lala_sedar.ImmoPulse.controllers.dto.out.DepartmentStatDTO;
-import fr.lala_sedar.ImmoPulse.controllers.dto.out.MarketMonthlyStatDTO;
-import fr.lala_sedar.ImmoPulse.controllers.dto.out.MarketPriceMonthlyStatDTO;
-import fr.lala_sedar.ImmoPulse.controllers.dto.out.MarketSummaryDTO;
+import fr.lala_sedar.ImmoPulse.controllers.dto.out.*;
 import fr.lala_sedar.ImmoPulse.infra.entity.LandTransactionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -93,44 +90,42 @@ public class LandTransactionRepository {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(LandTransactionEntity.class), limit, offset);
     }
 
-    public MarketSummaryDTO getGlobalStats() {
-        String sql = """
-        WITH
-        last_12_months AS (
-            SELECT 
+    public MarketSummaryDTO getGlobalStats(String departement, String propertyType) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                count() AS totalTransactions,
                 avg(property_value / nullIf(built_area, 0)) AS avgPricePerSqm,
                 avg(property_value) AS avgPrice,
-                count() AS totalTransactions,
                 sum(property_value) AS totalVolume
             FROM land_transaction
-            WHERE mutation_date >= subtractMonths(now(), 12)
-        ),
-        previous_12_months AS (
-            SELECT 
-                avg(property_value / nullIf(built_area, 0)) AS avgPricePerSqm,
-                avg(property_value) AS avgPrice
-            FROM land_transaction
-            WHERE mutation_date >= subtractMonths(now(), 24)
-              AND mutation_date < subtractMonths(now(), 12)
-        )
-        SELECT
-            l.totalTransactions,
-            l.avgPricePerSqm,
-            l.avgPrice,
-            l.totalVolume,
-            round((l.avgPrice - p.avgPrice) / p.avgPrice * 100, 2) AS yearOverYearChange
-        FROM last_12_months l
-        CROSS JOIN previous_12_months p
-        """;
+            WHERE 1=1
+        """);
 
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new MarketSummaryDTO(
-                rs.getLong("totalTransactions"),
-                rs.getDouble("avgPricePerSqm"),
-                rs.getDouble("avgPrice"),
-                rs.getDouble("totalVolume"),
-                rs.getDouble("yearOverYearChange")
-        ));
+        List<Object> params = new ArrayList<>();
+
+        if (departement != null && !departement.isBlank() && !departement.equalsIgnoreCase("all")) {
+            sql.append(" AND lower(department_code) = ?");
+            params.add(departement.toLowerCase());
+        }
+
+        if (propertyType != null && !propertyType.isBlank() && !propertyType.equalsIgnoreCase("all")) {
+            sql.append(" AND lower(property_type) = ?");
+            params.add(propertyType.toLowerCase());
+        }
+
+        return jdbcTemplate.queryForObject(
+                sql.toString(),
+                (rs, rowNum) -> new MarketSummaryDTO(
+                        rs.getLong("totalTransactions"),
+                        rs.getDouble("avgPricePerSqm"),
+                        rs.getDouble("avgPrice"),
+                        rs.getDouble("totalVolume")
+                ),
+                params.toArray()
+        );
     }
+
+
     public List<MarketMonthlyStatDTO> getMonthlyStats() {
         String sql = """
         SELECT
@@ -208,6 +203,55 @@ public class LandTransactionRepository {
                         rs.getLong("totalSales"),
                         rs.getDouble("priceEvolution")
                 )
+        );
+    }
+
+    public List<String> getAllDepartments() {
+        String sql = "SELECT DISTINCT department_code AS code FROM land_transaction";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("code"));
+    }
+
+    public List <String> getAllPropertyTypes() {
+        String sql = "SELECT DISTINCT if(length(trim(ifNull(property_type, ''))) = 0, 'Autre', property_type) AS type FROM land_transaction";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            String type = rs.getString("type");
+            if (type == null || type.isBlank()) {
+                return "Autre";
+            }
+            return type;
+        });
+    }
+
+
+    public List<PropertyDistributionDTO> getPropertyDistribution(String departement, String propertyType) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                property_type AS propertyType,
+                count() AS count
+            FROM land_transaction
+            WHERE 1=1
+        """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (departement != null && !departement.isBlank() && !departement.equalsIgnoreCase("all")) {
+            sql.append(" AND lower(department_code) = ?");
+            params.add(departement.toLowerCase());
+        }
+
+        if (propertyType != null && !propertyType.isBlank() && !propertyType.equalsIgnoreCase("all")) {
+            sql.append(" AND lower(property_type) = ?");
+            params.add(propertyType.toLowerCase());
+        }
+
+        sql.append(" GROUP BY property_type ORDER BY count DESC");
+
+        return jdbcTemplate.query(sql.toString(), (rs, rowNum) ->
+                new PropertyDistributionDTO(
+                        rs.getString("propertyType"),
+                        rs.getLong("count")
+                ),
+                params.toArray()
         );
     }
 }

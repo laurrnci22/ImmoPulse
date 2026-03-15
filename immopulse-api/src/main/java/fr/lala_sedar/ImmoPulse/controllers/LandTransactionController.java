@@ -21,6 +21,17 @@ public class LandTransactionController {
 
     private final LandTransactionService landTransactionService;
 
+
+    @GetMapping("/all-departments")
+    public List<String> getAllDepartments() {
+        return landTransactionService.getAllDepartments();
+    }
+
+    @GetMapping("all-property-types")
+    public List<String> getAllPropertyTypes() {
+        return landTransactionService.getAllPropertyTypes();
+    }
+
     @GetMapping
     public Page<LandTransactionDTO> getAll(
             @PageableDefault(size = 20, sort = "mutationDate", direction = Sort.Direction.DESC) Pageable pageable
@@ -34,11 +45,6 @@ public class LandTransactionController {
             @PageableDefault(size = 20, sort = "mutationDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return landTransactionService.search(term, pageable);
-    }
-
-    @GetMapping("/stats/global")
-    public MarketSummaryDTO getGlobalStats() {
-        return landTransactionService.getGlobalStats();
     }
 
     @GetMapping("/stats/monthly")
