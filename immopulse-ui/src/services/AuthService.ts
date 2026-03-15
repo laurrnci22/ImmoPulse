@@ -9,25 +9,40 @@ const BASE_URL = '/auth';
  * Sign out the current user
  */
 
+const clearCookieFrontend = (cookieName: string) => {
+    document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
 export const signOut = async ():  Promise<void> => {
     try {
+        clearCookieFrontend('JSESSIONID');
         await api.post<string>(
             `${BASE_URL}/logout`,
         );
-        delete api.defaults.headers.common["Authorization"];
+        clearCookieFrontend('JSESSIONID');
+        api.defaults.headers.common["Authorization"] = "czecezcezzec";
+        api.defaults.headers.common["Keep-Alive"] = 0;
 
+
+        /*       delete api.defaults.headers.common["authorization"];
+         delete api.defaults.headers.common["Cookie"];
+         delete api.defaults.
+  */
         try {
+
+            console.log("Cookies cleared on frontend.");
             await api.get(`${BASE_URL}/me`, {
                 auth: {
-                    username: 'logout', // Faux utilisateur
-                    password: 'logout'  // Faux mot de passe
+                    username: 'logout',
+                    password: 'logout'
                 }
             });
+            clearCookieFrontend('JSESSIONID');
         } catch (e) {
 
         }
     } catch (error) {
-        throw new Error("message");
+   //     throw new Error("message");
     }
 }
 

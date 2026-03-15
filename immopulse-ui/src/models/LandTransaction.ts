@@ -15,11 +15,3 @@ export interface LandTransaction {
     landArea: number;
 }
 
-export interface Departement {
-    label: string;
-    code: number;
-}
-
-export interface PropertyType {
-    label: string;
-}

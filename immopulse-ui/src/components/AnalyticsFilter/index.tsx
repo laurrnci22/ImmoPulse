@@ -1,8 +1,7 @@
 import { Filter } from "lucide-react";
 import { Card } from "../ui/card.tsx";
 import { type FC, useEffect, useState } from "react";
-import type { Departement } from "../../models/LandTransaction.ts";
-import {getDepartements, getPeriods, getPropertyTypes} from "../../services/LandTransactionService.ts";
+import {getDepartements, getPropertyTypes} from "../../services/LandTransactionService.ts";
 
 interface AnalyticsFilterProps {
     selectedDept: string;
@@ -10,22 +9,16 @@ interface AnalyticsFilterProps {
 
     selectedType: string;
     onTypeChange: (type: string) => void;
-
-    selectedPeriod: string;
-    onPeriodChange: (period: string) => void;
 }
 
 const AnalyticsFilter: FC<AnalyticsFilterProps> = ({
                                                        selectedDept,
                                                        onDeptChange,
                                                        selectedType,
-                                                       onTypeChange,
-                                                       selectedPeriod,
-                                                       onPeriodChange,
+                                                       onTypeChange
                                                    }) => {
-    const [departements, setDepartements] = useState<Departement[]>([]);
+    const [departements, setDepartements] = useState<string[]>([]);
     const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
-    const [periods, setPeriods] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchDepart = async () => {
@@ -46,18 +39,8 @@ const AnalyticsFilter: FC<AnalyticsFilterProps> = ({
             }
         }
 
-        const fetchPeriods = async () => {
-            try{
-                const data = await getPeriods();
-                setPeriods(data);
-            } catch(error){
-                console.error("Erreur lors du chargement des périodes", error);
-            }
-        }
-
         fetchDepart();
         fetchPropertyTypes();
-        fetchPeriods();
     }, []);
 
     return (
@@ -75,8 +58,8 @@ const AnalyticsFilter: FC<AnalyticsFilterProps> = ({
                 >
                     <option value="all">Tous les départements</option>
                     {departements.map((dept) => (
-                        <option key={dept.code} value={dept.code}>
-                            {dept.code} - {dept.label}
+                        <option key={dept} value={dept}>
+                            dept - {dept}
                         </option>
                     ))}
                 </select>
@@ -90,18 +73,6 @@ const AnalyticsFilter: FC<AnalyticsFilterProps> = ({
                     {propertyTypes.map((type) => (
                         <option key={type} value={type.toLowerCase()}>
                             {type}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    className="p-2 border rounded-md bg-white flex-1 w-full focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={selectedPeriod}
-                    onChange={(e) => onPeriodChange(e.target.value)}
-                >
-                    {periods.map((period) => (
-                        <option key={period} value={period}>
-                            Année {period}
                         </option>
                     ))}
                 </select>

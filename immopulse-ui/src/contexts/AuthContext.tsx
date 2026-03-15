@@ -69,7 +69,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             setIsLogout(true);
             await signOut();
+
+            console.log("Logout successful, clearing user data.");
+
             setUser(null);
+            localStorage.clear();
+            console.log("User data cleared from localStorage.");
             toast.success("Déconnexion réussie !");
         } catch (err) {
             if (err instanceof Error) {
