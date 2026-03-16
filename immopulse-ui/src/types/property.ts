@@ -88,6 +88,7 @@ export interface DepartmentBarData {
 
 export interface HistoryDataPoint {
   departmentCode: string;
+  departementName: string;
   avgPricePerSqm: number;
   avgPrice: number;
   totalSales: number;

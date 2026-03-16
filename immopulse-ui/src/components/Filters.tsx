@@ -7,6 +7,7 @@ import { Slider } from './ui/slider.tsx';
 import { Filter, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getDepartements, getPropertyTypes } from '../services/LandTransactionService.ts';
+import type { Departement } from '../types/property.ts';
 
 interface FiltersProps {
   filters: {
@@ -21,7 +22,7 @@ interface FiltersProps {
 
 export function Filters({ filters, onFiltersChange }: FiltersProps) {
   const [showFilters, setShowFilters] = useState(false);
-  const [departements, setDepartements] = useState<string[]>([]);
+  const [departements, setDepartements] = useState<Departement[]>([]);
   const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export function Filters({ filters, onFiltersChange }: FiltersProps) {
             >
               <option value="all">Toutes typologies</option>
               {propertyTypes.map((type) => (
-                  <option key={type} value={type.toLowerCase()}>
+                  <option key={type} value={type}>
                     {type}
                   </option>
               ))}
@@ -97,8 +98,8 @@ export function Filters({ filters, onFiltersChange }: FiltersProps) {
             >
               <option value="all">Tous les départements</option>
               {departements.map((dept) => (
-                  <option key={dept} value={dept}>
-                    Dept - {dept}
+                  <option key={dept.code} value={dept.code}>
+                    {dept.name}
                   </option>
               ))}
             </select>

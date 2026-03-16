@@ -1,14 +1,22 @@
 import api from "./api.ts";
 import { toast } from 'react-toastify';
-import type {KpiStats, PropertyTypeDistribution, PropertyMarketDynamics, ScatterDataPoint, AreaDataPoint
-    , DepartmentBarData, HistoryDataPoint} from "../types/property.ts";
-import {getdepartmentName} from "./GeoService.ts";
+import type {
+    KpiStats, PropertyTypeDistribution, PropertyMarketDynamics, ScatterDataPoint, AreaDataPoint,
+    DepartmentBarData, HistoryDataPoint
+} from "../types/property.ts";
+import { getdepartmentName } from "./GeoService.ts";
 
 const BASE_URL = '/stats';
 
-export const getKpiStats = async (selectedDept: string, selectedType : string): Promise<KpiStats> => {
+const cache = new Map<string, any>();
+
+export const getKpiStats = async (selectedDept: string, selectedType: string): Promise<KpiStats> => {
+    const cacheKey = `kpi_${selectedDept}_${selectedType}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
     try {
         const response = await api.get<KpiStats>(`${BASE_URL}/global?department=${selectedDept}&propertyType=${selectedType}`);
+        cache.set(cacheKey, response.data);
         return response.data;
     } catch (error) {
         toast.error("Erreur lors de la récupération des statistiques ! 😥");
@@ -17,8 +25,12 @@ export const getKpiStats = async (selectedDept: string, selectedType : string): 
 }
 
 export const getPropertyTypesDistribution = async (selectedDept: string, selectedType: string): Promise<PropertyTypeDistribution[]> => {
-    try{
+    const cacheKey = `dist_${selectedDept}_${selectedType}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+    try {
         const response = await api.get<PropertyTypeDistribution[]>(`${BASE_URL}/property-distribution?department=${selectedDept}&propertyType=${selectedType}`);
+        cache.set(cacheKey, response.data);
         return response.data;
     }
     catch (error) {
@@ -28,9 +40,13 @@ export const getPropertyTypesDistribution = async (selectedDept: string, selecte
 }
 
 export const getPropertyMarkets = async (selectedDept: string, selectedType: string): Promise<PropertyMarketDynamics[]> => {
-    try{
+    const cacheKey = `markets_${selectedDept}_${selectedType}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+    try {
         const response = await api.get<PropertyMarketDynamics[]>(`${BASE_URL}/market-stats?department=${selectedDept}&propertyType=${selectedType}`);
-       return response.data;
+        cache.set(cacheKey, response.data);
+        return response.data;
     }
     catch (error) {
         toast.error("Erreur lors de la récupération de la répartition par typologie ! 😥");
@@ -38,8 +54,10 @@ export const getPropertyMarkets = async (selectedDept: string, selectedType: str
     }
 }
 
-
 export const getScatterData = async (selectedDept: string, selectedType: string): Promise<ScatterDataPoint[]> => {
+    const cacheKey = `scatter_${selectedDept}_${selectedType}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
     try {
         const response = await api.get<any[]>(`${BASE_URL}/price-surface?department=${selectedDept}&propertyType=${selectedType}`);
         const data = response.data;
@@ -52,6 +70,7 @@ export const getScatterData = async (selectedDept: string, selectedType: string)
                 ville: await getdepartmentName(item.departmentCode),
             }))
         );
+        cache.set(cacheKey, formattedData);
         return formattedData;
     }
     catch (error) {
@@ -60,10 +79,13 @@ export const getScatterData = async (selectedDept: string, selectedType: string)
     }
 }
 
-
 export const getAreaData = async (selectedDept: string, selectedType: string): Promise<AreaDataPoint[]> => {
-    try{
+    const cacheKey = `area_${selectedDept}_${selectedType}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+    try {
         const response = await api.get<any[]>(`${BASE_URL}/volume-evolution?department=${selectedDept}&propertyType=${selectedType}`);
+        cache.set(cacheKey, response.data);
         return response.data;
     }
     catch (error) {
@@ -73,9 +95,12 @@ export const getAreaData = async (selectedDept: string, selectedType: string): P
 }
 
 export const getDepartmentBarData = async (selectedDept: string, selectedType: string): Promise<DepartmentBarData[]> => {
-    try{
+    const cacheKey = `deptBar_${selectedDept}_${selectedType}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+    try {
         const response = await api.get<any[]>(`${BASE_URL}/department-volume?department=${selectedDept}&propertyType=${selectedType}`);
-       const data = response.data;
+        const data = response.data;
 
         const formattedData = await Promise.all(
             data.map(async (item: any) => ({
@@ -84,8 +109,8 @@ export const getDepartmentBarData = async (selectedDept: string, selectedType: s
                 nom: await getdepartmentName(item.departmentCode),
             }))
         );
+        cache.set(cacheKey, formattedData);
         return formattedData;
-
     }
     catch (error) {
         toast.error("Erreur lors de la récupération des données de dispersion ! 😥");
@@ -94,12 +119,25 @@ export const getDepartmentBarData = async (selectedDept: string, selectedType: s
 }
 
 export const getHistory = async (): Promise<HistoryDataPoint[]> => {
-    try{
+    const cacheKey = `history`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+    try {
         const response = await api.get<HistoryDataPoint[]>(`${BASE_URL}/department-table`);
-        return response.data;
+        const data = response.data;
+        
+        const formattedData = await Promise.all(
+            data.map(async (item: any) => ({
+               ...item,
+                departementName: await getdepartmentName(item.departmentCode),
+            }))
+        );
+        
+        cache.set(cacheKey, formattedData);
+        return formattedData; 
     }
     catch (error) {
-        toast.error("Erreur lors de la récupération des données de dispersion ! 😥");
+        toast.error("Erreur lors de la récupération des données de palmarès ! 😥");
         throw error;
     }
 }

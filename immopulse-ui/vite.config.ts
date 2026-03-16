@@ -56,6 +56,12 @@
     },
     server: {
       port: 4250,
-      open: true,
+      host: true, 
+      open: false, 
     },
+    preview: {
+      port: 4250,
+      host: true, 
+      open: false,
+    }
   });

@@ -2,6 +2,7 @@ import { Filter } from "lucide-react";
 import { Card } from "../ui/card.tsx";
 import { type FC, useEffect, useState } from "react";
 import {getDepartements, getPropertyTypes} from "../../services/LandTransactionService.ts";
+import type { Departement } from '../../types/property.ts';
 
 interface AnalyticsFilterProps {
     selectedDept: string;
@@ -17,7 +18,7 @@ const AnalyticsFilter: FC<AnalyticsFilterProps> = ({
                                                        selectedType,
                                                        onTypeChange
                                                    }) => {
-    const [departements, setDepartements] = useState<string[]>([]);
+    const [departements, setDepartements] = useState<Departement[]>([]);
     const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
 
     useEffect(() => {
@@ -58,8 +59,8 @@ const AnalyticsFilter: FC<AnalyticsFilterProps> = ({
                 >
                     <option value="all">Tous les départements</option>
                     {departements.map((dept) => (
-                        <option key={dept} value={dept}>
-                            dept - {dept}
+                        <option key={dept.code} value={dept.code}>
+                            {dept.name}
                         </option>
                     ))}
                 </select>

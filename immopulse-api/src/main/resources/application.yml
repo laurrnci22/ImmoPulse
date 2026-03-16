@@ -11,22 +11,28 @@ spring:
       username: username
       password: password
       driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 10 
     clickhouse:
-      url: jdbc:clickhouse://localhost:8123/default?compress=0
+      url: jdbc:clickhouse://localhost:8123/default?compress=0&socket_timeout=180000
       username: username
       password: password
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+      hikari:
+        maximum-pool-size: 30
+        connection-timeout: 180000 
 
   jpa:
-    show-sql: true # to display SQL queries in the console
+    show-sql: true 
     hibernate:
-      ddl-auto: update # to let Spring create the schema by running migrations
+      ddl-auto: update 
 
 logging:
   level:
     org:
       springframework:
         web: DEBUG
+        cache: TRACE
 
 springdoc:
   swagger-ui:

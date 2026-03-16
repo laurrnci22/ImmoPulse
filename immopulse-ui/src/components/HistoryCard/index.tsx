@@ -97,10 +97,10 @@ const HistoryCard: FC<HistoryCardProps> = ({
                                 <tr className="border-b text-sm select-none">
                                     <th 
                                         className="text-left py-3 px-4 font-semibold cursor-pointer hover:bg-gray-50 transition-colors"
-                                        onClick={() => handleSort('departmentCode')}
+                                        onClick={() => handleSort('departementName')} 
                                     >
                                         <div className="flex items-center">
-                                            Département {getSortIcon('departmentCode')}
+                                            Département {getSortIcon('departementName')} 
                                         </div>
                                     </th>
                                     <th 
@@ -138,9 +138,9 @@ const HistoryCard: FC<HistoryCardProps> = ({
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentData.map((dept) => (
-                                    <tr key={dept.departmentCode} className="border-b hover:bg-gray-50 text-sm">
-                                        <td className="py-3 px-4 font-medium text-gray-800">Dép. {dept.departmentCode}</td>
+                                {currentData.map((dept, index) => (
+                                    <tr key={`dept-${dept.departmentCode}-${index}`} className="border-b hover:bg-gray-50 text-sm">
+                                        <td className="py-3 px-4 font-medium text-gray-800">{dept.departementName}</td>
                                         <td className="text-right py-3 px-4">{dept.avgPricePerSqm.toLocaleString('fr-FR')} €</td>
                                         <td className="text-right py-3 px-4">{(dept.avgPrice / 1000).toFixed(0)}K €</td>
                                         <td className="text-right py-3 px-4">{dept.totalSales.toLocaleString('fr-FR')}</td>
@@ -162,26 +162,26 @@ const HistoryCard: FC<HistoryCardProps> = ({
                                 Page {currentPage} sur {totalPages}
                             </span>
                             <div className="flex gap-2">
-                            <button
-                                type="button"
-                                aria-label="Page précédente"
-                                title="Page précédente"
-                                onClick={handlePrevPage}
-                                disabled={currentPage === 1}
-                                className="p-1 rounded border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <ChevronLeft className="size-5" />
-                            </button>
-                            <button
-                                type="button"
-                                aria-label="Page suivante"
-                                title="Page suivante"
-                                onClick={handleNextPage}
-                                disabled={currentPage === totalPages}
-                                className="p-1 rounded border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <ChevronRight className="size-5" />
-                            </button>
+                                <button
+                                    type="button"
+                                    aria-label="Page précédente"
+                                    title="Page précédente"
+                                    onClick={handlePrevPage}
+                                    disabled={currentPage === 1}
+                                    className="p-1 rounded border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronLeft className="size-5" />
+                                </button>
+                                <button
+                                    type="button"
+                                    aria-label="Page suivante"
+                                    title="Page suivante"
+                                    onClick={handleNextPage}
+                                    disabled={currentPage === totalPages}
+                                    className="p-1 rounded border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronRight className="size-5" />
+                                </button>
                             </div>
                         </div>
                     )}

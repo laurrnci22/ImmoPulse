@@ -66,16 +66,14 @@ services:
       CLICKHOUSE_PASSWORD: password
 
   ui:
-    build: ./immopulse-ui
+    build:
+      context: ./immopulse-ui
+      args:
+        - VITE_API_URL=http://localhost:8080/api
     container_name: immopulse-ui
     ports:
-      - "81:4250"
-    volumes:
-      - ./immopulse-ui:/app
-      - /app/node_modules
-    environment:
-      - VITE_API_URL=http://localhost:8080/api
-      
+      - "81:3000"
+    
     depends_on:
       database:
         condition: service_healthy
