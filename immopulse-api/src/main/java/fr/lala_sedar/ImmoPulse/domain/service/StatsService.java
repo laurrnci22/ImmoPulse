@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,26 @@ public class StatsService {
     @Cacheable("globalStats")
     public MarketSummaryDTO getGlobalStats(String departement, String propertyType) {
         return repository.getGlobalStats(departement, propertyType);
+    }
+
+    @Cacheable("monthlyStats")
+    public List<MarketMonthlyStatDTO> getMonthlyStats() {
+        return repository.getMonthlyStats();
+    }
+
+    @Cacheable("priceMonthlyStats")
+    public List<MarketPriceMonthlyStatDTO> getPriceMonthlyStats() {
+        return repository.getMonthlyStatsWithAvgPricePerSqm();
+    }
+
+    @Cacheable("departmentStats")
+    public List<DepartmentStatDTO> getDepartmentStats() {
+        return repository.getDepartmentStats();
+    }
+
+    @Cacheable("cityStatistics")
+    public List<Map<String, Object>> getCityStatistics() {
+        return repository.getAveragePriceByCity();
     }
 
     @Cacheable("propertyDistribution")
