@@ -1,5 +1,6 @@
 package fr.lala_sedar.ImmoPulse.infra.repository.clickhouse;
 
+import fr.lala_sedar.ImmoPulse.controllers.dto.in.LandTransactionFilterDto;
 import fr.lala_sedar.ImmoPulse.controllers.dto.out.*;
 import fr.lala_sedar.ImmoPulse.infra.entity.LandTransactionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -255,7 +256,6 @@ public class LandTransactionRepository {
         );
     }
 
-
     public List<MarketStatDTO> getMarketStats(String departement, String propertyType) {
         StringBuilder sql = new StringBuilder("""
         SELECT
@@ -471,5 +471,85 @@ public class LandTransactionRepository {
                         rs.getObject("priceEvolution") != null ? rs.getDouble("priceEvolution") : 0.0
                 )
         );
+    }
+
+    public List<LandTransactionEntity> searchWithFilters(LandTransactionFilterDto filters, Pageable pageable) {
+        int limit = pageable.getPageSize();
+        long offset = pageable.getOffset();
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM land_transaction WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (filters.getType() != null && !filters.getType().isBlank()
+                && !filters.getType().equalsIgnoreCase("all")) {
+            sql.append(" AND lower(property_type) = ?");
+            params.add(filters.getType().toLowerCase());
+        }
+
+        if (filters.getDepartment() != null && !filters.getDepartment().isBlank()
+                && !filters.getDepartment().equalsIgnoreCase("all")) {
+            sql.append(" AND lower(department_code) = ?");
+            params.add(filters.getDepartment().toLowerCase());
+        }
+
+        if (filters.getMinPrice() != null) {
+            sql.append(" AND property_value >= ?");
+            params.add(filters.getMinPrice());
+        }
+
+        if (filters.getMaxPrice() != null) {
+            sql.append(" AND property_value <= ?");
+            params.add(filters.getMaxPrice());
+        }
+
+        if (filters.getMinSurface() != null && filters.getMinSurface() > 0) {
+            sql.append(" AND built_area >= ?");
+            params.add(filters.getMinSurface());
+        }
+
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        return jdbcTemplate.query(
+                sql.toString(),
+                new BeanPropertyRowMapper<>(LandTransactionEntity.class),
+                params.toArray()
+        );
+    }
+
+    public long countWithFilters(LandTransactionFilterDto filters) {
+        StringBuilder sql = new StringBuilder("SELECT count() FROM land_transaction WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (filters.getType() != null && !filters.getType().isBlank()
+                && !filters.getType().equalsIgnoreCase("all")) {
+            sql.append(" AND lower(property_type) = ?");
+            params.add(filters.getType().toLowerCase());
+        }
+
+        if (filters.getDepartment() != null && !filters.getDepartment().isBlank()
+                && !filters.getDepartment().equalsIgnoreCase("all")) {
+            sql.append(" AND lower(department_code) = ?");
+            params.add(filters.getDepartment().toLowerCase());
+        }
+
+        if (filters.getMinPrice() != null) {
+            sql.append(" AND property_value >= ?");
+            params.add(filters.getMinPrice());
+        }
+
+        if (filters.getMaxPrice() != null) {
+            sql.append(" AND property_value <= ?");
+            params.add(filters.getMaxPrice());
+        }
+
+        if (filters.getMinSurface() != null && filters.getMinSurface() > 0) {
+            sql.append(" AND built_area >= ?");
+            params.add(filters.getMinSurface());
+        }
+
+        Long count = jdbcTemplate.queryForObject(sql.toString(), Long.class, params.toArray());
+        return count != null ? count : 0L;
     }
 }
