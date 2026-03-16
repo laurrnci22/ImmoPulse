@@ -94,3 +94,8 @@ export interface HistoryDataPoint {
   totalSales: number;
   priceEvolution: number;
 }
+
+export interface Departement{
+  code: string;
+  name: string;
+}
