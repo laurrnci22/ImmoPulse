@@ -36,7 +36,7 @@ const HistoryCard: FC<HistoryCardProps> = ({
             }
         };
         fetchStats();
-    }, [selectedDept, selectedType]);
+    }, []);
 
     const sortedData = useMemo(() => {
         let sortableItems = [...stats];
