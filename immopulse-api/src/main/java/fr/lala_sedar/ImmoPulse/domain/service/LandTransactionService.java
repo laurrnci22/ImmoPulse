@@ -13,18 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class LandTransactionService {
 
     private final LandTransactionRepository repository;
-
-    @Cacheable("cityStatistics")
-    public List<Map<String, Object>> getCityStatistics() {
-        return repository.getAveragePriceByCity();
-    }
 
     @Cacheable(value = "searchTransactions", key = "#term + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<LandTransactionDTO> search(String term, Pageable pageable) {
@@ -48,21 +42,6 @@ public class LandTransactionService {
         long total = repository.count("");
 
         return new PageImpl<>(content, pageable, total);
-    }
-
-    @Cacheable("monthlyStats")
-    public List<MarketMonthlyStatDTO> getMonthlyStats() {
-        return repository.getMonthlyStats();
-    }
-
-    @Cacheable("priceMonthlyStats")
-    public List<MarketPriceMonthlyStatDTO> getPriceMonthlyStats() {
-        return repository.getMonthlyStatsWithAvgPricePerSqm();
-    }
-
-    @Cacheable("departmentStats")
-    public List<DepartmentStatDTO> getDepartmentStats() {
-        return repository.getDepartmentStats();
     }
 
     @Cacheable("allDepartments")
