@@ -6,8 +6,6 @@ import { ChartLoading } from '../ui/chart-loading.tsx';
 import { TrendingDown, TrendingUp, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface HistoryCardProps {
-    selectedDept: string;
-    selectedType: string;
 }
 
 type SortConfig = {
@@ -16,8 +14,6 @@ type SortConfig = {
 };
 
 const HistoryCard: FC<HistoryCardProps> = ({
-    selectedDept,
-    selectedType,
 }) => {
     const [stats, setStats] = useState<HistoryDataPoint[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);

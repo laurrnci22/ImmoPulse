@@ -1,24 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Card} from '../../components/ui/card.tsx';
+import {useState} from 'react';
 
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ComposedChart,
-  Legend,
-  Line,
-  ResponsiveContainer,
-  Scatter,
-  ScatterChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-  ZAxis
-} from 'recharts';
 import AnalyticsFilter from "../../components/AnalyticsFilter";
 import KpiCard from "../../components/KpiCard";
 import {PieChartComponent} from "../../components/Chart/pieChart.tsx";
@@ -30,64 +11,8 @@ import HistoryCard from '../../components/HistoryCard';
 
 export function Dashboard() {
 
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [selectedDept, setSelectedDept] = useState<string>('all');
     const [selectedType, setSelectedType] = useState<string>('all');
-    const [selectedPeriod, setSelectedPeriod] = useState<string>('2023');
-   
-
-
-  useEffect(() => {
-
-    const fetchStats = async () => {
-      try {
-
-        /*  const departement: number | null = selectedDept !== 'all' ? parseInt(selectedDept) : null;
-
-        const data = await LandTransactionService.getGlobalStats(departement);
-        const formattedData: MarketStats = {
-          totalTransactions: data.totalTransactions,
-          avgPricePerSqm: data.avgPricePerSqm,
-          avgPrice: data.avgPrice,
-          totalVolume: data.totalVolume,
-          yearOverYearChange: data.yearOverYearChange,
-        };*/
-
-     /*   setStats(formattedData);
-
-        const monthly = await LandTransactionService.getMarketMonthlyStats();
-        setMonthlyStats(monthly);
-
-        const priceMonthly = await LandTransactionService.getMonthlyStatsWithAvgPricePerSqm();
-        setPriceAvgPerSqm(priceMonthly);
-
-        const departmentStats = await LandTransactionService.getDepartmentStats();
-        setDepartmentStats(departmentStats); */
-
-      } catch (error) {
-        console.error("Erreur de chargement des données statistiques", error);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
-
-
-    // Simulation de chargement lors d'un changement de filtre
-    useEffect(() => {
-       /* setIsLoading(true);
-        const timer = setTimeout(() => {
-            console.log("Appel API simulé avec filtres :", {selectedDept, selectedType, selectedPeriod});
-            setIsLoading(false);
-        }, 600);
-        return () => clearTimeout(timer);*/
-
-        setIsLoading(false);
-    }, [selectedDept, selectedType, selectedPeriod]);
-
-    // Gestionnaire pour cacher/afficher les séries du AreaChart
-  
    
 
     return (
@@ -105,16 +30,6 @@ export function Dashboard() {
                 selectedType={selectedType} onTypeChange={setSelectedType}
             />
 
-
-            {/* CHARGEMENT vs CONTENU */}
-            {isLoading ? (
-                <div className="h-64 flex flex-col items-center justify-center space-y-4">
-                    <div
-                        className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500 animate-pulse">Rechargement des données...</p>
-                </div>
-            ) : (
-                <>
                     {/* KPI CARDS */}
                     <KpiCard
                         selectedDept={selectedDept}
@@ -154,8 +69,6 @@ export function Dashboard() {
                     {/* ROW 4: Data Table */}
                     <HistoryCard />
 
-                </>
-            )}
 
             {/* FOOTER: Info */}
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
