@@ -24,6 +24,12 @@ export interface SignUpRequest {
     role: string;
 }
 
+export interface UpdateUserRequest {
+    username: string;
+    password: string;
+    role: string;
+}
+
 export interface LoginRegisterRequest {
     userId: string;
     email: string;

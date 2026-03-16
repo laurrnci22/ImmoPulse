@@ -5,6 +5,7 @@ import { Dashboard } from "./pages/Dashboard/Dashboard.tsx";
 import { PropertiesList } from "./pages/Properties/PropertiesList.tsx";
 import { Register } from "./components/Register";
 import {SearchProvider} from "./contexts/SearchContextType.tsx";
+import Profile from "./pages/User/Profile.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
             { path: "/dashboard", element: <Dashboard /> },
             { path: "/properties", element: <PropertiesList /> },
             { path: "/register", element: <Register /> },
+            {path: "/user/profile", element: <Profile/>}
         ],
     },
 ]);

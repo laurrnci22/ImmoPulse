@@ -1,5 +1,5 @@
 import api from "./api.ts";
-import type { SignInResponse, SignUpRequest} from "../types/AuthType.ts";
+import type {SignInResponse, SignUpRequest, UpdateUserRequest} from "../types/AuthType.ts";
 import type {User} from "../types/user.ts";
 
 const BASE_URL = '/auth';
@@ -91,3 +91,19 @@ export const createUser = async (request: SignUpRequest):  Promise<string> => {
         throw new Error("message");
     }
 }
+
+/**
+ * Update user
+ */
+export const updateUser = async (request: UpdateUserRequest, username: string | undefined): Promise<string> => {
+    try {
+        const response = await api.put<string>(`/users/${username}`, request);
+        return response.data;
+
+    } catch (error: any) {
+        if (error.response?.data) {
+            throw new Error(error.response.data);
+        }
+        throw new Error("An unexpected error occurred while updating the user.");
+    }
+};

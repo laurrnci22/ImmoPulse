@@ -67,4 +67,29 @@ public class UserController {
 
         return ResponseEntity.ok(users);
     }
+
+    /**
+     * Update user.
+     *
+     * @return 200 OK
+     * or 204 No Content if the list is empty.
+     */
+    @PutMapping("/{username}")
+    public ResponseEntity<String> updateUser(@RequestBody UserDto user, @PathVariable String username) {
+        try {
+            userService.updateProfile(user, username);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("User updated successfully!");
+        }
+        catch (IllegalArgumentException e) {
+            log.warn("Invalid registration attempt: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
+        catch (Exception e) {
+            log.error("Technical error during user registration", e);
+            return ResponseEntity.internalServerError()
+                    .body("An internal error occurred during registration.");
+        }
+    }
 }

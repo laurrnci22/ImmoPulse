@@ -1,9 +1,9 @@
 import {type ReactNode, useCallback, useEffect, useMemo, useState} from "react";
 import {useUserStore} from "../hooks/useUserStore.ts";
 import type {User} from "../types/user.ts";
-import {createUser, getCurrentUser, signIn, signOut} from "../services/AuthService.ts";
+import {createUser, getCurrentUser, signIn, signOut, updateUser} from "../services/AuthService.ts";
 import {toast} from "react-toastify";
-import type {SignUpRequest} from "../types/AuthType.ts";
+import type {SignUpRequest, UpdateUserRequest} from "../types/AuthType.ts";
 import { AuthContext } from "./AuthProvider.tsx";
 
 interface AuthProviderProps {
@@ -98,6 +98,24 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }, []);
 
+    /**
+     * Update user
+     */
+    const update = useCallback(async (request: UpdateUserRequest, username: string | undefined): Promise <boolean> => {
+        try {
+            await updateUser(request, username);
+            return true;
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("Une erreur inconnue est survenue.");
+            }
+            return false;
+        }
+    }, []);
+
     const contextValue = useMemo(
         () => ({
             user,
@@ -109,7 +127,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loginUser,
             logoutUser,
             signUp,
-            isLogout
+            isLogout,
+            update
         }),
         [
             user,
@@ -119,7 +138,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loginUser,
             logoutUser,
             signUp,
-            isLogout
+            isLogout,
+            update
         ],
     );
 
