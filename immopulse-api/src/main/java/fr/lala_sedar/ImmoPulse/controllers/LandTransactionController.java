@@ -1,5 +1,6 @@
 package fr.lala_sedar.ImmoPulse.controllers;
 
+import fr.lala_sedar.ImmoPulse.controllers.dto.in.LandTransactionFilterDto;
 import fr.lala_sedar.ImmoPulse.controllers.dto.out.*;
 import fr.lala_sedar.ImmoPulse.domain.service.LandTransactionService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,17 @@ public class LandTransactionController {
 
     private final LandTransactionService landTransactionService;
 
+
+    @GetMapping("/all-departments")
+    public List<String> getAllDepartments() {
+        return landTransactionService.getAllDepartments();
+    }
+
+    @GetMapping("all-property-types")
+    public List<String> getAllPropertyTypes() {
+        return landTransactionService.getAllPropertyTypes();
+    }
+
     @GetMapping
     public Page<LandTransactionDTO> getAll(
             @PageableDefault(size = 20, sort = "mutationDate", direction = Sort.Direction.DESC) Pageable pageable
@@ -36,11 +48,6 @@ public class LandTransactionController {
         return landTransactionService.search(term, pageable);
     }
 
-    @GetMapping("/stats/global")
-    public MarketSummaryDTO getGlobalStats() {
-        return landTransactionService.getGlobalStats();
-    }
-
     @GetMapping("/stats/monthly")
     public List<MarketMonthlyStatDTO> getMonthlyStats() {return landTransactionService.getMonthlyStats();}
 
@@ -49,6 +56,9 @@ public class LandTransactionController {
 
     @GetMapping("/stats/department")
     public List<DepartmentStatDTO> getDepartmentStats() {return landTransactionService.getDepartmentStats();}
+
+    @PostMapping("/search-filters")
+    public Page<LandTransactionDTO> searchWithFilters(@RequestBody LandTransactionFilterDto filters) {return landTransactionService.searchWithFilters(filters);}
 
     // TODO route non utilisée pour le moment
     @GetMapping("/stats/avg-price-city")

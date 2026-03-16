@@ -2,12 +2,11 @@
 
 import { Card } from './ui/card.tsx';
 import { Label } from './ui/label.tsx';
-import { Select } from './ui/select.tsx'; // Import simplifié
 import { Input } from './ui/input.tsx';
 import { Slider } from './ui/slider.tsx';
-import { Button } from './ui/button.tsx';
-import { SlidersHorizontal, X } from 'lucide-react';
-import { useState } from 'react';
+import { Filter, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getDepartements, getPropertyTypes } from '../services/LandTransactionService.ts';
 
 interface FiltersProps {
   filters: {
@@ -22,6 +21,38 @@ interface FiltersProps {
 
 export function Filters({ filters, onFiltersChange }: FiltersProps) {
   const [showFilters, setShowFilters] = useState(false);
+  const [departements, setDepartements] = useState<string[]>([]);
+  const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchDepart = async () => {
+      try {
+        const data = await getDepartements();
+        setDepartements(data);
+      } catch (error) {
+        console.error("Erreur lors du chargement des départements", error);
+      }
+    };
+
+    const fetchPropertyTypes = async () => {
+      try {
+        const data = await getPropertyTypes();
+        setPropertyTypes(data);
+      } catch (error) {
+        console.error("Erreur lors du chargement des types de propriétés", error);
+      }
+    };
+
+    fetchDepart();
+    fetchPropertyTypes();
+  }, []);
+
+  const hasActiveFilters =
+      filters.type !== 'all' ||
+      filters.minPrice > 0 ||
+      filters.maxPrice < 1000000 ||
+      filters.minSurface > 0 ||
+      filters.department !== 'all';
 
   const resetFilters = () => {
     onFiltersChange({
@@ -29,92 +60,99 @@ export function Filters({ filters, onFiltersChange }: FiltersProps) {
       minPrice: 0,
       maxPrice: 1000000,
       minSurface: 0,
-      department: 'all'
+      department: 'all',
     });
   };
 
   return (
       <div className="mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="gap-2"
-          >
-            <SlidersHorizontal className="size-4" />
-            Filtres
-          </Button>
-          {(filters.type !== 'all' || filters.minPrice > 0 || filters.maxPrice < 1000000 || filters.minSurface > 0 || filters.department !== 'all') && (
-              <Button variant="ghost" onClick={resetFilters} className="gap-2 text-red-500 hover:text-red-600">
-                <X className="size-4" />
-                Réinitialiser
-              </Button>
-          )}
-        </div>
+        <Card className="p-4 bg-gray-50 border-gray-200">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
 
-        {showFilters && (
-            <Card className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Label */}
+            <div className="flex items-center gap-2 text-gray-700 font-medium min-w-max">
+              <Filter className="size-5" />
+              <span>Filtres :</span>
+            </div>
 
-                {/* Type de bien */}
-                <div className="space-y-2">
-                  <Label>Type de bien</Label>
-                  <Select
-                      value={filters.type}
-                      onChange={(e) => onFiltersChange({ ...filters, type: e.target.value })}
-                      options={[
-                        { value: "all", label: "Tous" },
-                        { value: "Appartement", label: "Appartement" },
-                        { value: "Maison", label: "Maison" },
-                        { value: "Terrain", label: "Terrain" },
-                        { value: "Local commercial", label: "Local commercial" }
-                      ]}
-                  />
-                </div>
+            {/* Type de bien */}
+            <select
+                className="p-2 border rounded-md bg-white flex-1 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+                value={filters.type}
+                onChange={(e) => onFiltersChange({ ...filters, type: e.target.value })}
+            >
+              <option value="all">Toutes typologies</option>
+              {propertyTypes.map((type) => (
+                  <option key={type} value={type.toLowerCase()}>
+                    {type}
+                  </option>
+              ))}
+            </select>
 
-                {/* Department */}
-                <div className="space-y-2">
-                  <Label>Département</Label>
-                  <Select
-                      value={filters.department}
-                      onChange={(e) => onFiltersChange({ ...filters, department: e.target.value })}
-                      options={[
-                        { value: "all", label: "Tous" },
-                        { value: "75", label: "Paris (75)" },
-                        { value: "69", label: "Rhône (69)" },
-                        { value: "13", label: "Bouches-du-Rhône (13)" },
-                        { value: "31", label: "Haute-Garonne (31)" },
-                        { value: "33", label: "Gironde (33)" },
-                        { value: "44", label: "Loire-Atlantique (44)" }
-                      ]}
-                  />
-                </div>
+            {/* Département */}
+            <select
+                className="p-2 border rounded-md bg-white flex-1 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+                value={filters.department}
+                onChange={(e) => onFiltersChange({ ...filters, department: e.target.value })}
+            >
+              <option value="all">Tous les départements</option>
+              {departements.map((dept) => (
+                  <option key={dept} value={dept}>
+                    Dept - {dept}
+                  </option>
+              ))}
+            </select>
 
-                {/* Prix minimum */}
-                <div className="space-y-2">
-                  <Label>Prix minimum</Label>
+            {/* Bouton filtres avancés */}
+            <button
+                className="p-2 border rounded-md bg-white flex-1 w-full focus:ring-2 focus:ring-blue-500 outline-none text-left text-gray-500"
+                onClick={() => setShowFilters(!showFilters)}
+            >
+              {showFilters ? '▲ Moins de filtres' : '▼ Plus de filtres'}
+            </button>
+
+            {/* Reset */}
+            {hasActiveFilters && (
+                <button
+                    onClick={resetFilters}
+                    className="flex items-center gap-1 text-red-500 hover:text-red-600 text-sm min-w-max"
+                >
+                  <X className="size-4" />
+                  Réinitialiser
+                </button>
+            )}
+          </div>
+
+          {/* Filtres avancés */}
+          {showFilters && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
+
+                <div className="space-y-1">
+                  <Label className="text-gray-700 text-sm font-medium">Prix minimum</Label>
                   <Input
                       type="number"
                       value={filters.minPrice}
                       onChange={(e) => onFiltersChange({ ...filters, minPrice: Number(e.target.value) })}
                       placeholder="0 €"
+                      className="bg-white"
                   />
                 </div>
 
-                {/* Prix maximum */}
-                <div className="space-y-2">
-                  <Label>Prix maximum</Label>
+                <div className="space-y-1">
+                  <Label className="text-gray-700 text-sm font-medium">Prix maximum</Label>
                   <Input
                       type="number"
                       value={filters.maxPrice}
                       onChange={(e) => onFiltersChange({ ...filters, maxPrice: Number(e.target.value) })}
                       placeholder="1 000 000 €"
+                      className="bg-white"
                   />
                 </div>
 
-                {/* Surface minimum */}
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Surface minimum: {filters.minSurface} m²</Label>
+                <div className="space-y-1">
+                  <Label className="text-gray-700 text-sm font-medium">
+                    Surface minimum : {filters.minSurface} m²
+                  </Label>
                   <Slider
                       min={0}
                       max={300}
@@ -125,8 +163,8 @@ export function Filters({ filters, onFiltersChange }: FiltersProps) {
                   />
                 </div>
               </div>
-            </Card>
-        )}
+          )}
+        </Card>
       </div>
   );
 }

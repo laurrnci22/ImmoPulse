@@ -35,6 +35,7 @@ export const Header: FC<HeaderProps> = ({ onSearch }) => {
     const allowedNavigation = navigation.filter((item) => {
         if (item.name === "Dashboard") {
             return isAdmin;
+           
         }
         return true;
     });

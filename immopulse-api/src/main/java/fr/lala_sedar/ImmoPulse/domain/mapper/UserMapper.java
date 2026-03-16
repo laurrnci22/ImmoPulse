@@ -11,7 +11,7 @@ public class UserMapper {
     private static String DEFAULT_IMAGE_URL = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
 
     public static UserDTO toDTO(final UserEntity entity) {
-        return new UserDTO(entity.getUsername(), entity.getRole(), DEFAULT_IMAGE_URL );
+        return new UserDTO(entity.getUsername(), entity.getRole(), DEFAULT_IMAGE_URL, entity.getWishlist().stream().map(LandTransactionMapper::toDTO).toList());
     }
 
     public static UserResponseDTO toUserResponseDTO(final UserEntity entity) {

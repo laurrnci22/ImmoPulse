@@ -19,15 +19,21 @@ export function PropertiesList() {
     minPrice: 0,
     maxPrice: 5000000,
     minSurface: 0,
-    department: 'all'
+    department: 'all',
   });
+  
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [filters]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
         setIsFetching(true);
 
-        const data = await LandTransactionService.getLandTransactions(currentPage, 20, searchTerm);
+        const data = searchTerm
+            ? await LandTransactionService.getLandTransactions(currentPage, 20, searchTerm)
+            : await LandTransactionService.searchWithFilters(filters, currentPage, 20);
 
         setLandTransactions(data.content);
         setTotalPages(data.totalPages);
@@ -35,14 +41,13 @@ export function PropertiesList() {
 
       } catch (error) {
         console.error("Erreur de chargement", error);
-
       } finally {
         setIsFetching(false);
       }
     };
 
     fetchTransactions();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, filters]);
 
   return (
       <div className="container mx-auto px-4 py-8">

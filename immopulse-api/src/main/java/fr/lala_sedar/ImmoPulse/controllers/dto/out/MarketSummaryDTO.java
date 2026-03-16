@@ -4,6 +4,5 @@ public record MarketSummaryDTO (
     Long totalTransactions,
     Double avgPricePerSqm,
     Double avgPrice,
-    Double totalVolume,
-    Double yearOverYearChange
+    Double totalVolume
 ){}

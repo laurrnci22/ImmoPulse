@@ -54,8 +54,10 @@ SELECT
     c23 AS plot_number,
     -- Surface réelle bâti (c39)
     toFloat32OrZero(replaceAll(c39, ',', '.')) AS built_area,
-    -- Type local (c37)
-    c37 AS property_type,
+    
+    -- Type local (c37) transformé
+    if(empty(trim(c37)), 'Autre', c37) AS property_type,
+    
     -- Surface terrain (c43)
     toFloat32OrZero(replaceAll(c43, ',', '.')) AS land_area
 FROM file(

@@ -3,7 +3,7 @@ import axios from 'axios';
 const apiURL = import.meta.env.VITE_API_URL as string;
 const BASE_URL = `${apiURL}`;
 
-// Configuration d'Axios avec les cookies activés
+
 const api = axios.create({
     baseURL: BASE_URL,
     withCredentials: true,
