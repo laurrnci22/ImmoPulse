@@ -76,12 +76,9 @@ export interface ScatterDataPoint {
   ville: string;
 }
 
-export interface AreaDataPoint {
+export type AreaDataPoint = {
   month: string;
-  appartement: number;
-  maison: number;
-  terrain: number;
-}
+} & Record<string, number | string>;
 
 export interface DepartmentBarData {
   code: string;

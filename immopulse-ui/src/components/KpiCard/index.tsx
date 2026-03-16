@@ -3,6 +3,7 @@ import { type FC, useEffect, useState } from "react";
 import {KpiItem} from "./kpiItem.tsx";
 import type {KpiStats} from "../../types/property.ts";
 import {getKpiStats} from "../../services/StatsService.ts";
+import {ChartLoading} from "../ui/chart-loading.tsx";
 
 interface KpiCardProps {
     selectedDept: string;
@@ -13,6 +14,7 @@ const KpiCard: FC<KpiCardProps> = ({
                                                        selectedDept,
                                                        selectedType,
                                                    }) => {
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [stats, setStats] = useState<KpiStats>({
         totalTransactions: 0,
         avgPricePerSqm: 0,
@@ -22,6 +24,7 @@ const KpiCard: FC<KpiCardProps> = ({
 
     useEffect(() => {
         const fetchStats = async () => {
+            setIsLoading(true);
             try {
                 const data = await getKpiStats(selectedDept, selectedType);
                 const formattedData: KpiStats = {
@@ -33,12 +36,18 @@ const KpiCard: FC<KpiCardProps> = ({
                 setStats(formattedData);
             } catch (error) {
                 console.error("Erreur de chargement des données statistiques", error);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchStats();
     }, [selectedDept, selectedType]);
 
     return (
+        <>
+        {isLoading ? (
+                <ChartLoading />
+            ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <KpiItem
                 title="Transactions totales"
@@ -76,7 +85,8 @@ const KpiCard: FC<KpiCardProps> = ({
                 trendValue="Global"
                 trendDirection="neutral"
             />
-        </div>
+        </div>  )}
+        </>
     );
 };
 

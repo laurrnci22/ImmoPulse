@@ -3,6 +3,7 @@ import { Card } from "../ui/card.tsx";
 import {Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip} from "recharts";
 import type { PropertyTypeDistribution} from "../../types/property.ts";
 import {getPropertyTypesDistribution} from "../../services/StatsService.ts";
+import {ChartLoading} from "../ui/chart-loading.tsx";
 
 const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#22c55e', '#eab308'];
 
@@ -17,14 +18,18 @@ export const PieChartComponent: FC<PieChartProps> = ({
                                           }) => {
 
     const [propertyTypesDistribution, setPropertyTypesDistribution] = useState<PropertyTypeDistribution[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchStats = async () => {
+            setIsLoading(true);
             try {
                 const data = await getPropertyTypesDistribution(selectedDept, selectedType);
                 setPropertyTypesDistribution(data);
             } catch (error) {
                 console.error("Erreur de chargement des données statistiques", error);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchStats();
@@ -34,6 +39,9 @@ export const PieChartComponent: FC<PieChartProps> = ({
     return (
         <Card className="p-6 lg:col-span-1">
             <h2 className="text-lg font-semibold mb-4">Répartition par typologie</h2>
+            {isLoading ? (
+                <ChartLoading />
+            ) : (
             <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                     <Pie
@@ -49,7 +57,9 @@ export const PieChartComponent: FC<PieChartProps> = ({
                     <Tooltip formatter={(value: number) => value.toLocaleString('fr-FR')}/>
                     <Legend verticalAlign="bottom" height={36}/>
                 </PieChart>
+                
             </ResponsiveContainer>
+    )}
         </Card>
     );
 };
