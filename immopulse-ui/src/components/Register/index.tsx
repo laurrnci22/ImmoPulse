@@ -19,8 +19,6 @@ export const Register = () => {
     const [password, setPassword] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
-
-    const [role, setRole] = useState<"USER" | "ADMIN">("USER");
     const [isLoading, setIsLoading] = useState(false);
 
     const handleGeneratePassword = () => {
@@ -35,17 +33,17 @@ export const Register = () => {
         setIsLoading(true);
 
         try {
-
+            // Le rôle est maintenant forcé à "ADMIN"
             const requestData: SignUpRequest = {
                 username,
                 password,
-                role,
+                role: "ADMIN",
             };
 
             const response = await auth?.signUp?.(requestData);
 
             if (response) {
-                toast.success("Compte créé avec succès !");
+                toast.success("Compte administrateur créé avec succès !");
                 navigate("/");
             }
 
@@ -63,7 +61,7 @@ export const Register = () => {
 
                 <div className="text-center">
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-                        Créer un compte
+                        Créer un compte Administrateur
                     </h2>
                     <p className="mt-2 text-sm text-slate-500">
                         Rejoins ImmoPulse dès aujourd'hui
@@ -73,29 +71,6 @@ export const Register = () => {
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
 
                     <div className="space-y-4">
-
-                        {/* ROLE */}
-                        <div className="flex w-full p-1 bg-slate-100 rounded-lg">
-
-                            <Button
-                                type="button"
-                                variant={role === "USER" ? "default" : "ghost"}
-                                className={`w-1/2 text-sm ${role === "USER" ? "shadow-sm" : ""}`}
-                                onClick={() => setRole("USER")}
-                            >
-                                Utilisateur
-                            </Button>
-
-                            <Button
-                                type="button"
-                                variant={role === "ADMIN" ? "default" : "ghost"}
-                                className={`w-1/2 text-sm ${role === "ADMIN" ? "shadow-sm" : ""}`}
-                                onClick={() => setRole("ADMIN")}
-                            >
-                                Administrateur
-                            </Button>
-
-                        </div>
 
                         {/* USERNAME */}
                         <div>
