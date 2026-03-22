@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Service dedicated to managing user-related operations such as registration,
@@ -66,6 +68,19 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Retrieves a user by id from the database.
+     * @param id the id of the user to retrieve.
+     * @return a {@link UserDTO} representing the user with the specified id.
+     * @throws UsernameNotFoundException if the user with the specified id is not found.
+     */
+    @Transactional(readOnly = true)
+    public UserDTO findById(Long id) {
+        UserEntity user = repository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+        return UserMapper.toDTO(user);
+    }
+
+    /**
      * Loads a user by their username for Spring Security authentication.
      *
      * @param username the username identifying the user whose data is required.
@@ -99,5 +114,38 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
         return UserMapper.toUserResponseDTO(user);
+    }
+
+    /**
+     * Update user in the system.
+     *
+     * @param updateDto the data transfer object containing the new user's information.
+     * @param username
+     * @throws IllegalArgumentException if a user doesn't exist.
+     */
+    @Transactional
+    public void updateProfile(UserDto updateDto, String username) {
+        Optional<UserEntity> userEntityOptional = repository.findByUsername(username);
+
+        if (userEntityOptional.isPresent()) {
+            UserEntity userEntity = userEntityOptional.get();
+
+            if(repository.findByUsername(updateDto.getUsername()).isPresent() && !Objects.equals(updateDto.getUsername(), username)) {
+                throw new IllegalArgumentException("User with this username already exists: " + updateDto.getUsername());
+            }
+
+            userEntity.setUsername(updateDto.getUsername());
+
+            if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
+                userEntity.setPassword(passwordEncoder.encode(updateDto.getPassword()));
+            }
+
+            repository.save(userEntity);
+
+            log.info("User updated successfully: {}", updateDto.getUsername());
+
+        } else {
+            throw new IllegalArgumentException("User doesn't exist: " + username);
+        }
     }
 }

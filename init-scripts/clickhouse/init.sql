@@ -1,8 +1,9 @@
+-- 1. CRÉATION DE LA TABLE OPTIMISÉE
 CREATE TABLE IF NOT EXISTS land_transaction (
     id UUID DEFAULT generateUUIDv4(),
     mutation_date Date,
     mutation_type LowCardinality(String),
-    property_value Float64,
+    property_value Float64, -- Ou Decimal(18, 2) si vous voulez une précision financière parfaite
     street_number String,
     street_name String,
     postal_code String,
@@ -12,10 +13,21 @@ CREATE TABLE IF NOT EXISTS land_transaction (
     plot_number String,
     built_area Float32,
     property_type LowCardinality(String),
-    land_area Float32
-) ENGINE = MergeTree()
-ORDER BY (department_code, city, mutation_date);
+    land_area Float32,
 
+    -- INDEX DE SAUT (Data Skipping Indices) pour accélérer vos requêtes "search" (ILIKE)
+    INDEX idx_city city TYPE tokenbf_v1(10240, 2, 0) GRANULARITY 1,
+    INDEX idx_street street_name TYPE tokenbf_v1(10240, 2, 0) GRANULARITY 1,
+    INDEX idx_postal postal_code TYPE bloom_filter() GRANULARITY 1
+
+) ENGINE = MergeTree()
+-- PARTITIONNEMENT : Découpe physique des fichiers par mois (ex: 202501, 202502)
+PARTITION BY toYYYYMM(mutation_date)
+-- CLÉ DE TRI : L'ordre est vital. department_code d'abord, PUIS property_type.
+ORDER BY (department_code, property_type, city, mutation_date);
+
+
+-- 2. INSERTION DES DONNÉES
 INSERT INTO land_transaction (
     mutation_date,
     mutation_type,
@@ -42,8 +54,8 @@ SELECT
     c12 AS street_number,
     -- Nom de la voie (c14 + c16 pour avoir le type et le nom)
     trim(concat(c14, ' ', c16)) AS street_name,
-    -- Code postal (c17)
-    c17 AS postal_code,
+    -- Code postal (c17) (Parfois des valeurs nulles dans DVF, on s'assure que c'est propre)
+    ifNull(c17, '') AS postal_code,
     -- Commune (c18)
     c18 AS city,
     -- Code département (c19)
@@ -54,8 +66,10 @@ SELECT
     c23 AS plot_number,
     -- Surface réelle bâti (c39)
     toFloat32OrZero(replaceAll(c39, ',', '.')) AS built_area,
-    -- Type local (c37)
-    c37 AS property_type,
+    
+    -- Type local (c37) transformé
+    if(empty(trim(c37)), 'Autre', c37) AS property_type,
+    
     -- Surface terrain (c43)
     toFloat32OrZero(replaceAll(c43, ',', '.')) AS land_area
 FROM file(
@@ -63,5 +77,7 @@ FROM file(
     'CSV', 
     'c1 String, c2 String, c3 String, c4 String, c5 String, c6 String, c7 String, c8 String, c9 String, c10 String, c11 String, c12 String, c13 String, c14 String, c15 String, c16 String, c17 String, c18 String, c19 String, c20 String, c21 String, c22 String, c23 String, c24 String, c25 String, c26 String, c27 String, c28 String, c29 String, c30 String, c31 String, c32 String, c33 String, c34 String, c35 String, c36 String, c37 String, c38 String, c39 String, c40 String, c41 String, c42 String, c43 String'
 )
-WHERE c9 != 'Date mutation' AND c9 != '' -- On évite les entêtes et les lignes vides
+WHERE c9 != 'Date mutation' 
+  AND c9 != '' -- On évite les entêtes et les lignes vides
+  AND c19 != '' -- Exclure les transactions sans département (données corrompues fréquentes dans DVF)
 SETTINGS format_csv_delimiter = ';';

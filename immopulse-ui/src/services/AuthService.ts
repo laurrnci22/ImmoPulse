@@ -1,0 +1,124 @@
+import api from "./api.ts";
+import type {SignInResponse, SignUpRequest, UpdateUserRequest} from "../types/AuthType.ts";
+import type {User} from "../types/user.ts";
+
+const BASE_URL = '/auth';
+
+
+/**
+ * Sign out the current user
+ */
+
+const clearCookieFrontend = (cookieName: string) => {
+    document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+export const signOut = async ():  Promise<void> => {
+    try {
+        clearCookieFrontend('JSESSIONID');
+        await api.post<string>(
+            `${BASE_URL}/logout`,
+        );
+        clearCookieFrontend('JSESSIONID');
+        api.defaults.headers.common["Authorization"] = "czecezcezzec";
+        api.defaults.headers.common["Keep-Alive"] = 0;
+
+
+        /*       delete api.defaults.headers.common["authorization"];
+         delete api.defaults.headers.common["Cookie"];
+         delete api.defaults.
+  */
+        try {
+
+            console.log("Cookies cleared on frontend.");
+            await api.get(`${BASE_URL}/me`, {
+                auth: {
+                    username: 'logout',
+                    password: 'logout'
+                }
+            });
+            clearCookieFrontend('JSESSIONID');
+        } catch (e) {
+
+        }
+    } catch (error) {
+   //     throw new Error("message");
+    }
+}
+
+/**
+ * Check if the current session is authenticated
+ */
+export const isAuthenticated = async ():  Promise<boolean> => {
+    try {
+        await api.get(`${BASE_URL}/me`);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Sign in with email/username and password
+ */
+export const signIn = async ():  Promise<void> => {
+    try {
+      await api.post<SignInResponse>(
+            `${BASE_URL}/login`,
+      );
+    } catch (error) {
+    //    const message = getApiErrorMessage2(error);
+        throw new Error("message");
+    }
+}
+
+
+
+/**
+ * Get the current authenticated user data
+ */
+
+export const getCurrentUser = async ():  Promise<User> => {
+    try {
+        const response = await api.get<User>(`${BASE_URL}/me`);
+        return response.data;
+    } catch (error) {
+    //    const message = getApiErrorMessage2(error);
+        throw new Error("message");
+    }
+}
+
+
+
+/**
+ * Register a new user
+ */
+export const createUser = async (request: SignUpRequest):  Promise<string> => {
+    try {
+        console.log("Attempting to create user with request:", request);
+        const response = await api.post<string>(`/users`, request);
+
+        console.log("User creation response -----")
+        console.log(response);
+        return response.data;
+    } catch (error) {
+      //  const message = getApiErrorMessage2(error);
+        throw new Error("message");
+    }
+}
+
+/**
+ * Update user
+ */
+export const updateUser = async (request: UpdateUserRequest, username: string | undefined): Promise<string> => {
+    try {
+        const response = await api.put<string>(`/users/${username}`, request);
+        return response.data;
+
+    } catch (error: any) {
+        if (error.response?.data) {
+            throw new Error(error.response.data);
+        }
+        throw new Error("An unexpected error occurred while updating the user.");
+    }
+};

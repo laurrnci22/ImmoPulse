@@ -17,11 +17,10 @@ export interface Property {
 
 export interface DepartmentStats {
   departmentCode: string;
-  departmentName: string;
   avgPricePerSqm: number;
   totalSales: number;
   avgPrice: number;
-  priceEvolution: number; // Percentage change
+  priceEvolution: number;
 }
 
 export interface MonthlyStats {
@@ -37,4 +36,66 @@ export interface MarketStats {
   avgPrice: number;
   totalVolume: number;
   yearOverYearChange: number;
+}
+
+
+export interface KpiStats {
+  totalTransactions: number;
+  avgPricePerSqm: number;
+  avgPrice: number;
+  totalVolume: number;
+}
+
+export interface KpiItem {
+  value: number;
+  trendValue: string;
+  up?: boolean;
+}
+
+export interface MarketPriceStats {
+  month: string;
+  sales: number;
+  avgPricePerSqm: number;
+}
+
+export interface PropertyTypeDistribution {
+  name: string;
+  value: number;
+}
+
+export interface PropertyMarketDynamics {
+  month: string;
+  volumeVentes: number;
+  prixMoyen: number;
+}
+
+export interface ScatterDataPoint {
+  surface: number;
+  prix: number;
+  type: string;
+  ville: string;
+}
+
+export type AreaDataPoint = {
+  month: string;
+} & Record<string, number | string>;
+
+export interface DepartmentBarData {
+  code: string;
+  nom: string;
+  volume: number;
+}
+
+export interface HistoryDataPoint {
+  departmentCode: string;
+  departementName: string;
+  avgPricePerSqm: number;
+  avgPrice: number;
+  totalSales: number;
+  priceEvolution: number;
+}
+
+export interface Departement{
+  code: string;
+  name: string;
 }

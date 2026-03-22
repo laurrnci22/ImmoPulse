@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
 @Entity
@@ -23,5 +26,22 @@ public class UserEntity  {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_wishlist",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "land_transaction_id")
+    )
+    private List<LandTransactionEntity> wishlist = new ArrayList<>();
+
+    public void addToWishlist(LandTransactionEntity transaction) {
+        this.wishlist.add(transaction);
+    }
+
+    public void removeFromWishlist(LandTransactionEntity transaction) {
+        this.wishlist.remove(transaction);
+    }
 
 }

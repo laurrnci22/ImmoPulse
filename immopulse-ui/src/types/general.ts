@@ -10,6 +10,7 @@ export interface UserData {
     name: string;
     email: string;
     imageUrl: string;
+    role: string;
 }
 
 export interface HeaderProps {

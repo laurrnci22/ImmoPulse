@@ -14,3 +14,4 @@ export interface LandTransaction {
     builtArea: number;
     landArea: number;
 }
+

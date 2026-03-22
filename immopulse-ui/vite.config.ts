@@ -55,7 +55,13 @@
       outDir: 'build',
     },
     server: {
-      port: 3000,
-      open: true,
+      port: 4250,
+      host: true, 
+      open: false, 
     },
+    preview: {
+      port: 4250,
+      host: true, 
+      open: false,
+    }
   });
